@@ -1,33 +1,38 @@
 {
-  "name": "nextjs",
-  "description": "Schema for a blog built with Next.js",
-  "license": "UNLICENSED",
+  "private": true,
+  "name": "remix-app-template",
+  "description": "",
+  "license": "",
+  "scripts": {
+    "postinstall": "remix setup node",
+    "dev": "remix dev",
+    "build": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' prisma generate && remix build",
+    "init": "prisma db push && prisma db seed",
+    "prisma:generate": "prisma generate"
+  },
   "dependencies": {
-    "@prisma/client": "3.4.2",
-    "next": "11.1.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "@prisma/client": "^3.8.1",
+    "@remix-run/react": "^1.1.3",
+    "@remix-run/serve": "^1.1.3",
+    "@remix-run/vercel": "^1.1.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "remix": "^1.1.3"
   },
   "devDependencies": {
-    "@types/faker": "5.5.9",
-    "@types/node": "16.11.7",
-    "@types/react": "17.0.34",
-    "eslint": "7.32.0",
-    "eslint-config-next": "11.1.2",
-    "faker": "5.5.3",
-    "prisma": "3.4.2",
-    "ts-node": "10.4.0",
-    "typescript": "4.4.4"
+    "@remix-run/dev": "^1.1.3",
+    "@types/react": "^17.0.24",
+    "@types/react-dom": "^17.0.9",
+    "prettier": "^2.5.1",
+    "prisma": "^3.8.1",
+    "typescript": "^4.1.2"
   },
-  "prisma": {
-    "seed": "ts-node ./prisma/seed.ts"
+  "prettier": {
+    "singleQuote": true,
+    "semi": false
   },
-  "scripts": {
-    "init": "prisma db push && prisma db seed",
-    "dev": "next dev",
-    "build": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' prisma generate && next build",
-    "start": "next start",
-    "lint": "next lint",
-    "prisma:generate": "prisma generate"
-  }
+  "engines": {
+    "node": ">=14"
+  },
+  "sideEffects": false
 }
