@@ -9,21 +9,19 @@ datasource db {
 }
 
 model Gym {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   name      String
   address   String
   image_url String?
   site      String?
   Problem   Problem[]
-  User      User?     @relation(fields: [userId], references: [id])
-  userId    Int?
 }
 
 model Problem {
-  id        Int      @id @default(autoincrement())
-  gym_id    Int
+  id        String   @id @default(uuid())
+  gym_id    String
   gym       Gym      @relation(fields: [gym_id], references: [id])
-  setter_id Int
+  setter_id String
   setter    User     @relation(fields: [setter_id], references: [id])
   date      DateTime
   image_url String
@@ -37,19 +35,18 @@ model Problem {
 }
 
 model User {
-  id      Int       @id @default(autoincrement())
+  id      String    @id @default(uuid())
   email   String    @unique
   name    String
-  Gym     Gym[]
   Problem Problem[]
   Send    Send[]
   Like    Like[]
 }
 
 model Send {
-  problem_id Int
+  problem_id String
   problem    Problem  @relation(fields: [problem_id], references: [id])
-  user_id    Int
+  user_id    String
   sender     User     @relation(fields: [user_id], references: [id])
   date       DateTime
   grade      String
@@ -59,9 +56,9 @@ model Send {
 }
 
 model Like {
-  problem_id Int
+  problem_id String
   problem    Problem @relation(fields: [problem_id], references: [id])
-  user_id    Int
+  user_id    String
   user       User    @relation(fields: [user_id], references: [id])
 
   @@id([problem_id, user_id])
