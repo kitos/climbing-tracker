@@ -14,7 +14,7 @@ model Gym {
   address   String
   image_url String?
   site      String?
-  Problem   Problem[]
+  problems  Problem[]
 }
 
 model Problem {
@@ -30,17 +30,17 @@ model Problem {
   hold_type String?
   wall_type String?
   style     String?
-  Send      Send[]
-  Like      Like[]
+  sends     Send[]
+  likes     Like[]
 }
 
 model User {
-  id      String    @id @default(uuid())
-  email   String    @unique
-  name    String
-  Problem Problem[]
-  Send    Send[]
-  Like    Like[]
+  id              String    @id @default(uuid())
+  email           String    @unique
+  name            String
+  setted_problems Problem[]
+  sends           Send[]
+  likes           Like[]
 }
 
 model Send {
