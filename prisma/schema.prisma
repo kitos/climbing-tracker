@@ -21,8 +21,8 @@ model Problem {
   id        String   @id @default(uuid())
   gym_id    String
   gym       Gym      @relation(fields: [gym_id], references: [id])
-  setter_id String
-  setter    User     @relation(fields: [setter_id], references: [id])
+  setter_id String?
+  setter    User?    @relation(fields: [setter_id], references: [id])
   date      DateTime
   image_url String
   color     String

@@ -4,13 +4,17 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
-} from "remix";
-import type { MetaFunction } from "remix";
+  ScrollRestoration,
+} from 'remix'
+import type { MetaFunction } from 'remix'
+import styles from 'antd/dist/antd.css'
+import { Layout, Typography } from 'antd'
 
-export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
-};
+export let meta: MetaFunction = () => {
+  return { title: 'New Remix App' }
+}
+
+export let links = () => [{ rel: 'stylesheet', href: styles }]
 
 export default function App() {
   return (
@@ -22,11 +26,21 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <Layout>
+          <Layout.Header>
+            <Typography.Title style={{ color: '#fff' }}>
+              Climbing Tracker
+            </Typography.Title>
+          </Layout.Header>
+
+          <Layout.Content style={{ padding: 50 }}>
+            <Outlet />
+          </Layout.Content>
+        </Layout>
         <ScrollRestoration />
         <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
+        {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
     </html>
-  );
+  )
 }
