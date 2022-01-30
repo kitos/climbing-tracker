@@ -38,6 +38,7 @@ model User {
   id              String    @id @default(uuid())
   email           String    @unique
   name            String
+  magic_key       String?
   setted_problems Problem[]
   sends           Send[]
   likes           Like[]
