@@ -6,8 +6,8 @@ invariant(process.env.MAGIC_EMAIL_FROM, 'MAGIC_EMAIL_FROM is required!')
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-let siteDomain = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+let siteDomain = process.env.VERCEL
+  ? `https://climbing-tracker.vercel.app`
   : 'http://localhost:3000'
 
 export let sendMagicLinkEmail = (to: string, token: string) =>
