@@ -9,39 +9,45 @@ datasource db {
 }
 
 model Gym {
-  id        String    @id @default(uuid())
-  name      String
-  address   String
-  image_url String?
-  site      String?
-  problems  Problem[]
+  id            String    @id @default(cuid())
+  created_by_id String
+  created_by    User      @relation(fields: [created_by_id], references: [id])
+  name          String
+  address       String
+  image_url     String?
+  site          String?
+  problems      Problem[]
 }
 
 model Problem {
-  id        String   @id @default(uuid())
-  gym_id    String
-  gym       Gym      @relation(fields: [gym_id], references: [id])
-  setter_id String?
-  setter    User?    @relation(fields: [setter_id], references: [id])
-  date      DateTime
-  image_url String
-  color     String
-  gym_grade String
-  hold_type String?
-  wall_type String?
-  style     String?
-  sends     Send[]
-  likes     Like[]
+  id            String   @id @default(cuid())
+  gym_id        String
+  gym           Gym      @relation(fields: [gym_id], references: [id])
+  created_by_id String
+  created_by    User     @relation("creator", fields: [created_by_id], references: [id])
+  setter_id     String?
+  setter        User?    @relation("setter", fields: [setter_id], references: [id])
+  date          DateTime
+  image_url     String
+  color         String
+  gym_grade     String
+  hold_type     String?
+  wall_type     String?
+  style         String?
+  sends         Send[]
+  likes         Like[]
 }
 
 model User {
-  id              String    @id @default(uuid())
-  email           String    @unique
-  name            String
-  magic_key       String?
-  setted_problems Problem[]
-  sends           Send[]
-  likes           Like[]
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String
+  magic_key        String?
+  sends            Send[]
+  likes            Like[]
+  setted_problems  Problem[] @relation("setter")
+  setted_gyms      Gym[]
+  created_problems Problem[] @relation("creator")
 }
 
 model Send {
