@@ -1,7 +1,8 @@
-import { Form as RemixForm } from '@remix-run/react'
+import { Form as RemixForm, useTransition } from '@remix-run/react'
 import { Button, Form, Input } from 'antd'
-import { ActionFunction, redirect } from 'remix'
+import { ActionFunction, LoaderFunction, redirect } from 'remix'
 import { prisma } from '../../../../../lib/prisma'
+import { requireUserId } from '../../../../session.server'
 
 let fields = [
   'image_url',
@@ -12,7 +13,10 @@ let fields = [
   'style',
 ] as const
 
+export let loader: LoaderFunction = ({ request }) => requireUserId(request)
+
 export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
+  let userId = await requireUserId(request)
   let formData = await request.formData()
   let data = Object.fromEntries(
     fields.map((f) => [f, formData.get(f)])
@@ -21,6 +25,7 @@ export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
   await prisma.problem.create({
     data: {
       gym: { connect: { id: gym_id! } },
+      created_by: { connect: { id: userId } },
       date: new Date(),
       ...data,
     },
@@ -30,6 +35,8 @@ export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
 }
 
 export default function NewProblem() {
+  let { state } = useTransition()
+
   return (
     <RemixForm method="post">
       <Form component={false} labelCol={{ span: 4 }} wrapperCol={{ span: 16 }}>
@@ -64,7 +71,11 @@ export default function NewProblem() {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={state === 'submitting' || state === 'loading'}
+          >
             Save
           </Button>
         </Form.Item>

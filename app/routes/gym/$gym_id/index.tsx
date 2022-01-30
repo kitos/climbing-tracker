@@ -4,25 +4,42 @@ import { ActionFunction, redirect } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { Table } from 'antd'
 import { Column } from 'rc-table'
+import { getUserId, requireUserId } from '../../../session.server'
 
-export let loader = async ({ params }: DataFunctionArgs) =>
-  prisma.gym.findUnique({
-    select: { id: true, name: true, problems: true },
-    where: { id: params.gym_id },
-  })
+export let loader = async ({ request, params }: DataFunctionArgs) => {
+  let [userId, gym] = await Promise.all([
+    getUserId(request),
+    prisma.gym.findUnique({
+      select: { id: true, name: true, problems: true, created_by_id: true },
+      where: { id: params.gym_id },
+    }),
+  ])
+
+  return { canDelete: userId === gym?.created_by_id, gym }
+}
 
 export let action: ActionFunction = async ({ request, params }) => {
   if (request.method.toLowerCase() === 'delete') {
-    await prisma.gym.delete({ where: { id: params.gym_id } })
+    let userId = await requireUserId(request)
+    let byId = { where: { id: params.gym_id } }
+    let gym = await prisma.gym.findUnique({
+      select: { created_by_id: true },
+      ...byId,
+    })
 
-    return redirect('/')
+    if (gym && userId === gym.created_by_id) {
+      await prisma.gym.delete(byId)
+      return redirect('/')
+    } else {
+      return null
+    }
   }
 }
 
 type IGym = Awaited<ReturnType<typeof loader>>
 
 export default function GymPage() {
-  let gym = useLoaderData<IGym>()
+  let { canDelete, gym } = useLoaderData<IGym>()
 
   if (!gym) {
     return <h1>Not found</h1>
@@ -47,9 +64,11 @@ export default function GymPage() {
 
       <Link to="problem/new">Add new problem</Link>
 
-      <Form method="delete">
-        <button type="submit">Delete</button>
-      </Form>
+      {canDelete && (
+        <Form method="delete">
+          <button type="submit">Delete</button>
+        </Form>
+      )}
     </div>
   )
 }

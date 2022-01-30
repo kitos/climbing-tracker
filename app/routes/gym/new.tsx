@@ -1,26 +1,30 @@
-import { Form } from '@remix-run/react'
-import { ActionFunction, redirect } from 'remix'
+import { Form, useTransition } from '@remix-run/react'
+import { ActionFunction, LoaderFunction, redirect } from 'remix'
 import { prisma } from '../../../lib/prisma'
-import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { requireUserId } from '../../session.server'
+import { Button } from 'antd'
 
-export let loader = ({ request }: DataFunctionArgs) => requireUserId(request)
+export let loader: LoaderFunction = ({ request }) => requireUserId(request)
 
 export let action: ActionFunction = async ({ request }) => {
+  let userId = await requireUserId(request)
   let formData = await request.formData()
 
-  let data = {
-    name: formData.get('name') as string,
-    address: formData.get('address') as string,
-    site: formData.get('site') as string,
-  }
-
-  await prisma.gym.create({ data })
+  await prisma.gym.create({
+    data: {
+      created_by: { connect: { id: userId } },
+      name: formData.get('name') as string,
+      address: formData.get('address') as string,
+      site: formData.get('site') as string,
+    },
+  })
 
   return redirect('/')
 }
 
 export default function NewGym() {
+  let { state } = useTransition()
+
   return (
     <Form method="post">
       <p>
@@ -39,7 +43,13 @@ export default function NewGym() {
         </label>
       </p>
       <p>
-        <button type="submit">Create Gym</button>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={state === 'submitting' || state === 'loading'}
+        >
+          Create Gym
+        </Button>
       </p>
     </Form>
   )
