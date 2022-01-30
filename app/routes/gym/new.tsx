@@ -1,6 +1,10 @@
 import { Form } from '@remix-run/react'
 import { ActionFunction, redirect } from 'remix'
 import { prisma } from '../../../lib/prisma'
+import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
+import { requireUserId } from '../../session.server'
+
+export let loader = ({ request }: DataFunctionArgs) => requireUserId(request)
 
 export let action: ActionFunction = async ({ request }) => {
   let formData = await request.formData()
@@ -15,6 +19,7 @@ export let action: ActionFunction = async ({ request }) => {
 
   return redirect('/')
 }
+
 export default function NewGym() {
   return (
     <Form method="post">
