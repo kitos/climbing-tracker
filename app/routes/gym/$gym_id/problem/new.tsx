@@ -113,7 +113,7 @@ export default function NewProblem() {
             labelId="color-label"
             label="Color"
             name="color"
-            defaultValue={colors[0]}
+            defaultValue=""
             required
           >
             {colors.map((c) => (

@@ -10,7 +10,14 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
     getUserId(request),
     prisma.gym.findUnique({
-      select: { id: true, name: true, problems: true, created_by_id: true },
+      select: {
+        id: true,
+        name: true,
+        problems: {
+          include: { _count: { select: { likes: true, sends: true } } },
+        },
+        created_by_id: true,
+      },
       where: { id: params.gym_id },
     }),
   ])
@@ -82,11 +89,11 @@ export default function GymPage() {
               description={new Date(p.date).toLocaleDateString()}
             />
             <Space size="middle">
-              <Badge size="small" color="green" count={1}>
+              <Badge size="small" color="green" count={p._count.sends}>
                 <Avatar size={24} shape="square" icon={<CheckCircleFilled />} />
               </Badge>
 
-              <Badge size="small" color="green" count={1}>
+              <Badge size="small" color="green" count={p._count.likes}>
                 <Avatar size={24} shape="square" icon={<HeartFilled />} />
               </Badge>
             </Space>
