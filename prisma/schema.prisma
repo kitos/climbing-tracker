@@ -52,9 +52,9 @@ model User {
 
 model Send {
   problem_id String
-  problem    Problem  @relation(fields: [problem_id], references: [id])
+  problem    Problem  @relation(fields: [problem_id], references: [id], onDelete: Cascade)
   user_id    String
-  sender     User     @relation(fields: [user_id], references: [id])
+  sender     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   date       DateTime
   grade      String
   attempts   String
@@ -64,9 +64,9 @@ model Send {
 
 model Like {
   problem_id String
-  problem    Problem @relation(fields: [problem_id], references: [id])
+  problem    Problem @relation(fields: [problem_id], references: [id], onDelete: Cascade)
   user_id    String
-  user       User    @relation(fields: [user_id], references: [id])
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([problem_id, user_id])
 }
