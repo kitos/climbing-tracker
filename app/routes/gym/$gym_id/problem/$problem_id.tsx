@@ -4,18 +4,22 @@ import { Form, useLoaderData, useTransition } from '@remix-run/react'
 import { LoadingButton } from '@mui/lab'
 import { DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { requireUserId } from '../../../../session.server'
+import { getUserId, requireUserId } from '../../../../session.server'
 import { Stack } from '@mui/material'
 
-export let loader = async ({ params: { problem_id } }: DataFunctionArgs) => {
-  let [likes, problem] = await Promise.all([
+export let loader = async ({
+  request,
+  params: { problem_id },
+}: DataFunctionArgs) => {
+  let [likes, problem, userId] = await Promise.all([
     prisma.like.count({ where: { problem_id } }),
     prisma.problem.findUnique({
       where: { id: problem_id },
     }),
+    getUserId(request),
   ])
 
-  return { likes, problem }
+  return { likes, problem, canDelete: userId === problem?.created_by_id }
 }
 
 export let action: ActionFunction = async ({
