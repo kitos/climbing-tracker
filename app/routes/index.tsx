@@ -1,25 +1,29 @@
 import { prisma } from '../../lib/prisma'
 import { Link, useLoaderData } from '@remix-run/react'
+import { List } from 'antd'
 
 export let loader = () =>
-  prisma.gym.findMany({ select: { id: true, name: true } })
+  prisma.gym.findMany({ select: { id: true, name: true, address: true } })
 
 export default function Index() {
   let gyms = useLoaderData<Awaited<ReturnType<typeof loader>>>()
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      <h1>Climbing Tracker</h1>
-
-      <Link to="/gym/new">Add new gym</Link>
-
-      <ul>
+    <div>
+      <List bordered>
         {gyms.map((g) => (
-          <li key={g.id}>
-            <Link to={`/gym/${g.id}`}>{g.name}</Link>
-          </li>
+          <List.Item key={g.id}>
+            <List.Item.Meta
+              title={<Link to={`/gym/${g.id}`}>{g.name}</Link>}
+              description={g.address}
+            />
+          </List.Item>
         ))}
-      </ul>
+      </List>
+
+      <Link to="/gym/new" style={{ display: 'block', marginTop: 16 }}>
+        Add new gym
+      </Link>
     </div>
   )
 }

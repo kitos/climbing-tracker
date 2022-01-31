@@ -8,13 +8,20 @@ import {
 } from 'remix'
 import type { MetaFunction } from 'remix'
 import styles from 'antd/dist/antd.css'
-import { Layout, Typography } from 'antd'
+import { Layout } from 'antd'
+import { Link } from '@remix-run/react'
 
 export let meta: MetaFunction = () => {
   return { title: 'New Remix App' }
 }
 
-export let links = () => [{ rel: 'stylesheet', href: styles }]
+export let links = () => [
+  { rel: 'stylesheet', href: styles },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap',
+  },
+]
 
 export default function App() {
   return (
@@ -28,12 +35,12 @@ export default function App() {
       <body>
         <Layout>
           <Layout.Header>
-            <Typography.Title style={{ color: '#fff' }}>
-              Climbing Tracker
-            </Typography.Title>
+            <Link style={{ fontSize: 32 }} to="/">
+              🧗‍♀️
+            </Link>
           </Layout.Header>
 
-          <Layout.Content style={{ padding: 50 }}>
+          <Layout.Content style={{ background: '#fff', padding: 16 }}>
             <Outlet />
           </Layout.Content>
         </Layout>

@@ -1,0 +1,13 @@
+diff --git a/node_modules/@remix-run/server-runtime/data.js b/node_modules/@remix-run/server-runtime/data.js
+index 8d26ad0..fcaa389 100644
+--- a/node_modules/@remix-run/server-runtime/data.js
++++ b/node_modules/@remix-run/server-runtime/data.js
+@@ -34,7 +34,7 @@ async function callRouteAction({
+ 
+   try {
+     result = await action({
+-      request: stripDataParam(stripIndexParam(request.clone())),
++      request: stripDataParam(stripIndexParam(request)),
+       context: loadContext,
+       params: match.params
+     });

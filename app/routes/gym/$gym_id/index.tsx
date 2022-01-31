@@ -2,9 +2,9 @@ import { prisma } from '../../../../lib/prisma'
 import { Form, Link, useLoaderData } from '@remix-run/react'
 import { ActionFunction, redirect } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { Table } from 'antd'
-import { Column } from 'rc-table'
+import { Avatar, Badge, List, Row, Space, Tag } from 'antd'
 import { getUserId, requireUserId } from '../../../session.server'
+import { CheckCircleFilled, HeartFilled } from '@ant-design/icons'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
@@ -38,37 +38,65 @@ export let action: ActionFunction = async ({ request, params }) => {
 
 type IGym = Awaited<ReturnType<typeof loader>>
 
+let cdnRoot = 'https://ik.imagekit.io/kitos'
+
+let trImg = (src: string, size = 100) =>
+  src.replace(cdnRoot, `${cdnRoot}/tr:w-${size},h-${size}`)
+
 export default function GymPage() {
   let { canDelete, gym } = useLoaderData<IGym>()
 
   if (!gym) {
-    return <h1>Not found</h1>
+    return null
   }
 
   return (
     <div>
-      <Link to="/">Home</Link>
-      <h1>Gym: {gym.name}</h1>
+      <Row justify="space-between">
+        <h1>{gym.name}</h1>
 
-      <h2>Problems</h2>
+        {canDelete && (
+          <Form method="delete">
+            <button type="submit">❌</button>
+          </Form>
+        )}
+      </Row>
 
-      <Table dataSource={gym.problems}>
-        <Column
-          title="Date"
-          dataIndex="date"
-          key="date"
-          render={(v, p: any) => <Link to={`problem/${p.id}`}>{v}</Link>}
-        />
-        <Column title="Color" dataIndex="color" key="color" />
-      </Table>
+      <List
+        dataSource={gym.problems}
+        bordered
+        renderItem={(p) => (
+          <List.Item key={p.id}>
+            <List.Item.Meta
+              avatar={
+                <Avatar shape="square" size={48} src={trImg(p.image_url)} />
+              }
+              title={
+                <Link to={`problem/${p.id}`}>
+                  <Space size="small">
+                    <span>Grade - {p.gym_grade}</span>
+                    <Tag color={p.color}>{p.hold_type ?? 'pinch'}</Tag>
+                  </Space>
+                </Link>
+              }
+              description={new Date(p.date).toLocaleDateString()}
+            />
+            <Space size="middle">
+              <Badge size="small" color="green" count={1}>
+                <Avatar size={24} shape="square" icon={<CheckCircleFilled />} />
+              </Badge>
 
-      <Link to="problem/new">Add new problem</Link>
+              <Badge size="small" color="green" count={1}>
+                <Avatar size={24} shape="square" icon={<HeartFilled />} />
+              </Badge>
+            </Space>
+          </List.Item>
+        )}
+      />
 
-      {canDelete && (
-        <Form method="delete">
-          <button type="submit">Delete</button>
-        </Form>
-      )}
+      <Link to="problem/new" style={{ display: 'block', marginTop: 16 }}>
+        Add new problem
+      </Link>
     </div>
   )
 }
