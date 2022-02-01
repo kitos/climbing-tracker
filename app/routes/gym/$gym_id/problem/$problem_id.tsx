@@ -46,8 +46,16 @@ export let action: ActionFunction = async ({
       break
     }
     case 'delete': {
-      await prisma.problem.delete({ where: { id: problem_id } })
-      return redirect(`/gym/${gym_id}`)
+      let byId = { where: { id: problem_id } }
+      let problem = await prisma.problem.findUnique({
+        select: { created_by_id: true },
+        ...byId,
+      })
+
+      if (problem?.created_by_id === userId) {
+        await prisma.problem.delete(byId)
+        return redirect(`/gym/${gym_id}`)
+      }
     }
   }
 
