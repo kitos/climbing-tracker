@@ -55,7 +55,8 @@ export let action: ActionFunction = async ({
 }
 
 export default function ProblemPage() {
-  let { likes, problem } = useLoaderData<Awaited<ReturnType<typeof loader>>>()
+  let { likes, problem, canDelete } =
+    useLoaderData<Awaited<ReturnType<typeof loader>>>()
   let { state, submission } = useTransition()
   let _action = submission?.formData.get('_action')
 
@@ -81,18 +82,20 @@ export default function ProblemPage() {
             Like ({likes})
           </LoadingButton>
 
-          <LoadingButton
-            variant="contained"
-            color="error"
-            startIcon={<DeleteOutlined />}
-            loading={state === 'submitting' && _action === 'delete'}
-            loadingPosition="start"
-            type="submit"
-            name="_action"
-            value="delete"
-          >
-            Delete
-          </LoadingButton>
+          {canDelete && (
+            <LoadingButton
+              variant="contained"
+              color="error"
+              startIcon={<DeleteOutlined />}
+              loading={state === 'submitting' && _action === 'delete'}
+              loadingPosition="start"
+              type="submit"
+              name="_action"
+              value="delete"
+            >
+              Delete
+            </LoadingButton>
+          )}
         </Stack>
       </Form>
     </Stack>
