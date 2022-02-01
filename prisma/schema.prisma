@@ -22,7 +22,7 @@ model Gym {
 model Problem {
   id            String   @id @default(cuid())
   gym_id        String
-  gym           Gym      @relation(fields: [gym_id], references: [id])
+  gym           Gym      @relation(fields: [gym_id], references: [id], onDelete: Cascade)
   created_by_id String
   created_by    User     @relation("creator", fields: [created_by_id], references: [id])
   setter_id     String?

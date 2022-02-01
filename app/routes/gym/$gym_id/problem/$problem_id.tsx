@@ -1,11 +1,12 @@
 import { prisma } from '../../../../../lib/prisma'
 import { ActionFunction, redirect } from 'remix'
 import { Form, useLoaderData, useTransition } from '@remix-run/react'
+import { Stack } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { getUserId, requireUserId } from '../../../../session.server'
-import { Stack } from '@mui/material'
+import { trImg } from '../../../../image'
 
 export let loader = async ({
   request,
@@ -64,10 +65,10 @@ export default function ProblemPage() {
 
   return (
     <Stack spacing={2}>
-      <h1>{problem.id}</h1>
-      <img src={problem.image_url} alt="" />
+      <img src={trImg(problem.image_url, 400)} alt="" />
+
       <Form method="post" replace>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" justifyContent="space-between">
           <LoadingButton
             variant="outlined"
             startIcon={<ThumbUpOutlined />}

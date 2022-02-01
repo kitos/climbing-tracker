@@ -1,10 +1,24 @@
-import { prisma } from '../../../../lib/prisma'
 import { Form, Link, useLoaderData } from '@remix-run/react'
 import { ActionFunction, redirect } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { Avatar, Badge, List, Row, Space, Tag } from 'antd'
+import {
+  Avatar,
+  Badge,
+  Button,
+  Chip,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  ListSubheader,
+  Stack,
+} from '@mui/material'
+import { Delete, ThumbUp, CheckBox } from '@mui/icons-material'
+import { prisma } from '../../../../lib/prisma'
 import { getUserId, requireUserId } from '../../../session.server'
-import { CheckCircleFilled, HeartFilled } from '@ant-design/icons'
+import { trImg } from '../../../image'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
@@ -45,11 +59,6 @@ export let action: ActionFunction = async ({ request, params }) => {
 
 type IGym = Awaited<ReturnType<typeof loader>>
 
-let cdnRoot = 'https://ik.imagekit.io/kitos'
-
-let trImg = (src: string, size = 100) =>
-  src.replace(cdnRoot, `${cdnRoot}/tr:w-${size},h-${size}`)
-
 export default function GymPage() {
   let { canDelete, gym } = useLoaderData<IGym>()
 
@@ -58,52 +67,78 @@ export default function GymPage() {
   }
 
   return (
-    <div>
-      <Row justify="space-between">
+    <Stack spacing={2}>
+      <Stack direction="row" justifyContent="space-between">
         <h1>{gym.name}</h1>
 
         {canDelete && (
           <Form method="delete">
-            <button type="submit">❌</button>
+            <IconButton type="submit" color="error">
+              <Delete />
+            </IconButton>
           </Form>
         )}
-      </Row>
+      </Stack>
 
-      <List
-        dataSource={gym.problems}
-        bordered
-        renderItem={(p) => (
-          <List.Item key={p.id}>
-            <List.Item.Meta
-              avatar={
-                <Avatar shape="square" size={48} src={trImg(p.image_url)} />
-              }
-              title={
-                <Link to={`problem/${p.id}`}>
-                  <Space size="small">
-                    <span>Grade - {p.gym_grade}</span>
-                    <Tag color={p.color}>{p.hold_type ?? 'pinch'}</Tag>
-                  </Space>
-                </Link>
-              }
-              description={new Date(p.date).toLocaleDateString()}
-            />
-            <Space size="middle">
-              <Badge size="small" color="green" count={p._count.sends}>
-                <Avatar size={24} shape="square" icon={<CheckCircleFilled />} />
-              </Badge>
+      <List subheader={<ListSubheader>Problems</ListSubheader>}>
+        {gym.problems.map((problem) => (
+          <ListItem
+            key={problem.id}
+            disablePadding
+            secondaryAction={
+              <Stack direction="row" spacing={2}>
+                {problem._count.sends ? (
+                  <Badge
+                    badgeContent={problem._count.sends}
+                    color="secondary"
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                  >
+                    <CheckBox />
+                  </Badge>
+                ) : null}
 
-              <Badge size="small" color="green" count={p._count.likes}>
-                <Avatar size={24} shape="square" icon={<HeartFilled />} />
-              </Badge>
-            </Space>
-          </List.Item>
-        )}
-      />
+                {problem._count.likes ? (
+                  <Badge
+                    badgeContent={problem._count.likes}
+                    color="success"
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
+                    <ThumbUp />
+                  </Badge>
+                ) : null}
+              </Stack>
+            }
+          >
+            <ListItemButton component={Link} to={`problem/${problem.id}`}>
+              <ListItemAvatar>
+                <Badge badgeContent={problem.gym_grade} color="primary">
+                  <Avatar variant="rounded" src={trImg(problem.image_url)} />
+                </Badge>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Chip
+                    label={problem.hold_type}
+                    size="small"
+                    style={{ background: problem.color }}
+                  />
+                }
+                secondary={new Date(problem.date).toLocaleDateString()}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
 
-      <Link to="problem/new" style={{ display: 'block', marginTop: 16 }}>
+      <Button component={Link} variant="contained" to="problem/new">
         Add new problem
-      </Link>
-    </div>
+      </Button>
+    </Stack>
   )
 }
