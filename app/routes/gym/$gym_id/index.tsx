@@ -15,7 +15,7 @@ import {
   ListSubheader,
   Stack,
 } from '@mui/material'
-import { Delete, ThumbUp, CheckBox } from '@mui/icons-material'
+import { Delete, ThumbUp } from '@mui/icons-material'
 import { prisma } from '../../../../lib/prisma'
 import { getUserId, requireUserId } from '../../../session.server'
 import { trImg } from '../../../image'
