@@ -1,4 +1,5 @@
 import { LoaderFunction, redirect } from 'remix'
+import { Typography } from '@mui/material'
 import { finishMagicLogin, getUserId } from '../session.server'
 
 export let loader: LoaderFunction = async ({ request }) => {
@@ -18,5 +19,9 @@ export let loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function MagicPage() {
-  return <div>Check your email sandbox to finish login process.</div>
+  return (
+    <Typography variant="h6" component="p">
+      Check your email sandbox to finish login process.
+    </Typography>
+  )
 }

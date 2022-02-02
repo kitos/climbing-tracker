@@ -22,6 +22,16 @@ let sessionStorage = createCookieSessionStorage({
 export let getUserSession = (request: Request) =>
   sessionStorage.getSession(request.headers.get('Cookie'))
 
+export let logout = async (request: Request) => {
+  let session = await getUserSession(request)
+
+  return redirect(request.referrer || '/', {
+    headers: {
+      'Set-Cookie': await sessionStorage.destroySession(session),
+    },
+  })
+}
+
 export let getUserId = async (request: Request) => {
   let session = await getUserSession(request)
   let userId = session.get('userId')
@@ -76,7 +86,7 @@ export let finishMagicLogin = async (jwtToken: string) => {
     let user = await prisma.user.findFirst({ where: { magic_key: magicKey } })
 
     if (user) {
-      return createUserSession(user.id, redirectTo ?? '/')
+      return createUserSession(user.id, redirectTo || '/')
     } else {
       return redirect('/login')
     }

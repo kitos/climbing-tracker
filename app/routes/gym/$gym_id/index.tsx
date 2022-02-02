@@ -14,6 +14,7 @@ import {
   ListItemText,
   ListSubheader,
   Stack,
+  Typography,
 } from '@mui/material'
 import { Delete, ThumbUp } from '@mui/icons-material'
 import { prisma } from '../../../../lib/prisma'
@@ -72,8 +73,10 @@ export default function GymPage() {
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" justifyContent="space-between">
-        <h1>{gym.name}</h1>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Typography component="h1" variant="h5">
+          {gym.name}
+        </Typography>
 
         {canDelete && (
           <Form method="delete">
@@ -96,20 +99,18 @@ export default function GymPage() {
               key={problem.id}
               disablePadding
               secondaryAction={
-                <Stack direction="row" spacing={2}>
-                  {problem._count.likes ? (
-                    <Badge
-                      badgeContent={problem._count.likes}
-                      color="success"
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                      }}
-                    >
-                      <ThumbUp />
-                    </Badge>
-                  ) : null}
-                </Stack>
+                problem._count.likes ? (
+                  <Badge
+                    badgeContent={problem._count.likes}
+                    color="primary"
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
+                    <ThumbUp />
+                  </Badge>
+                ) : null
               }
             >
               <ListItemButton component={Link} to={`problem/${problem.id}`}>
@@ -125,6 +126,7 @@ export default function GymPage() {
                     <Avatar variant="rounded" src={trImg(problem.image_url)} />
                   </Badge>
                 </ListItemAvatar>
+
                 <ListItemText
                   primary={
                     <Chip
@@ -133,7 +135,7 @@ export default function GymPage() {
                       style={{ background: problem.color }}
                     />
                   }
-                  secondary={new Date(problem.date).toLocaleDateString()}
+                  secondary={new Date(problem.date).toLocaleDateString('en-GB')}
                 />
               </ListItemButton>
             </ListItem>

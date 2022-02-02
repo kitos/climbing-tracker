@@ -23,6 +23,7 @@ import { UploadFile } from '@mui/icons-material'
 import { prisma } from '../../../../../lib/prisma'
 import { requireUserId } from '../../../../session.server'
 import { uploadImage } from '../../../imagekitUploader.server'
+import { Photo } from '../../../../Photo'
 
 export let loader: LoaderFunction = ({ request }) => requireUserId(request)
 
@@ -68,19 +69,6 @@ const colors = [
 
 const holdTypes = ['jug', 'crimp', 'pinch', 'sloper', 'pocket', 'volume']
 
-let Photo = ({ file }: { file?: File }) => {
-  let height = 200
-  return file ? (
-    <img
-      src={URL.createObjectURL(file)}
-      alt={file.name}
-      style={{ height, objectFit: 'scale-down' }}
-    />
-  ) : (
-    <div style={{ height, background: 'lightgray' }} />
-  )
-}
-
 export default function NewProblem() {
   let { state } = useTransition()
   let [img, setImg] = useState<File>()
@@ -98,11 +86,7 @@ export default function NewProblem() {
             name="img"
             hidden
           />
-          <Button
-            variant="contained"
-            component="span"
-            startIcon={<UploadFile />}
-          >
+          <Button variant="contained" startIcon={<UploadFile />}>
             Upload image
           </Button>
         </label>

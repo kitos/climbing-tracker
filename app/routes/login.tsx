@@ -4,8 +4,9 @@ import {
   redirect,
   useSearchParams,
 } from 'remix'
-import { Form as RemixForm } from '@remix-run/react'
-import { Button, Form, Input } from 'antd'
+import { Form, useTransition } from '@remix-run/react'
+import { Stack, TextField } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 import { getUserId, initMagicLogin } from '../session.server'
 
 export let loader: LoaderFunction = async ({ request }) => {
@@ -15,35 +16,31 @@ export let loader: LoaderFunction = async ({ request }) => {
 }
 
 export let action: ActionFunction = async ({ request }) => {
-  let formData = await request.formData()
+  let { email, redirectTo } = Object.fromEntries(await request.formData())
 
-  return initMagicLogin(
-    formData.get('email') as string,
-    formData.get('redirectTo') as string
-  )
+  return initMagicLogin(email as string, redirectTo as string)
 }
 
 export default function LoginPage() {
   let [searchParams] = useSearchParams()
+  let { state } = useTransition()
 
   return (
-    <RemixForm method="post">
+    <Stack component={Form} method="post" spacing={2}>
       <input
         type="hidden"
         name="redirectTo"
         value={searchParams.get('redirectTo') ?? void 0}
       />
-      <Form component={false} labelCol={{ span: 4 }} wrapperCol={{ span: 8 }}>
-        <Form.Item label="Email" rules={[{ required: true, message: 'Cmon!' }]}>
-          <Input name="email" />
-        </Form.Item>
+      <TextField label="Email" name="email" type="email" required />
 
-        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Button type="primary" htmlType="submit">
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
-    </RemixForm>
+      <LoadingButton
+        type="submit"
+        variant="contained"
+        loading={state === 'submitting'}
+      >
+        Login
+      </LoadingButton>
+    </Stack>
   )
 }
