@@ -56,7 +56,7 @@ model Send {
   user_id    String
   sender     User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   date       DateTime
-  grade      String
+  grade      Int
   attempts   String
 
   @@id([problem_id, user_id])
