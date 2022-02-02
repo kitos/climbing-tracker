@@ -16,6 +16,7 @@ model Gym {
   address       String
   image_url     String?
   site          String?
+  logo          String?
   problems      Problem[]
 }
 
