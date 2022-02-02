@@ -1,38 +1,52 @@
-import { prisma } from '../../../../../lib/prisma'
+import { useState } from 'react'
 import { ActionFunction, redirect } from 'remix'
 import { Form, useLoaderData, useTransition } from '@remix-run/react'
-import { Stack } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+} from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-import { DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
+import { Check, DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { getUserId, requireUserId } from '../../../../session.server'
 import { trImg } from '../../../../image'
+import { prisma } from '../../../../../lib/prisma'
+import { SendProblemForm } from '../../../../problem/SendProblemForm'
 
-export let loader = async ({
-  request,
-  params: { problem_id },
-}: DataFunctionArgs) => {
-  let [likes, problem, userId] = await Promise.all([
-    prisma.like.count({ where: { problem_id } }),
+export let loader = async ({ request, params }: DataFunctionArgs) => {
+  let problem_id = params.problem_id!
+  let user_id = await getUserId(request)
+
+  let [problem, send] = await Promise.all([
     prisma.problem.findUnique({
+      include: {
+        likes: { select: { user_id: true } },
+        sends: { select: { user_id: true } },
+      },
       where: { id: problem_id },
     }),
-    getUserId(request),
+    user_id
+      ? prisma.send.findUnique({
+          where: { problem_id_user_id: { problem_id, user_id } },
+        })
+      : null,
   ])
 
-  return { likes, problem, canDelete: userId === problem?.created_by_id }
+  return { problem, userId: user_id, send }
 }
 
-export let action: ActionFunction = async ({
-  request,
-  params: { gym_id, problem_id },
-}) => {
-  let userId = await requireUserId(request)
+export let action: ActionFunction = async ({ request, params }) => {
+  let problem_id = params.problem_id!
+  let user_id = await requireUserId(request)
   let formData = await request.formData()
 
   switch (formData.get('_action')) {
     case 'like': {
-      let like = { problem_id: problem_id!, user_id: userId }
+      let like = { problem_id, user_id }
 
       let existing = await prisma.like.findUnique({
         where: { problem_id_user_id: like },
@@ -52,10 +66,32 @@ export let action: ActionFunction = async ({
         ...byId,
       })
 
-      if (problem?.created_by_id === userId) {
+      if (problem?.created_by_id === user_id) {
         await prisma.problem.delete(byId)
-        return redirect(`/gym/${gym_id}`)
+        return redirect(`/gym/${params.gym_id}`)
       }
+      break
+    }
+    case 'send': {
+      let { attempts, grade, date } = Object.fromEntries(formData) as Record<
+        string,
+        string
+      >
+      let data = {
+        date: new Date(date).toISOString(),
+        grade: parseInt(grade),
+        attempts,
+      }
+
+      await prisma.send.upsert({
+        create: {
+          problem: { connect: { id: problem_id } },
+          sender: { connect: { id: user_id } },
+          ...data,
+        },
+        update: data,
+        where: { problem_id_user_id: { problem_id, user_id } },
+      })
     }
   }
 
@@ -63,14 +99,21 @@ export let action: ActionFunction = async ({
 }
 
 export default function ProblemPage() {
-  let { likes, problem, canDelete } =
+  let { problem, userId, send } =
     useLoaderData<Awaited<ReturnType<typeof loader>>>()
   let { state, submission } = useTransition()
+  let [isSendDialogOpen, toggleSendDialog] = useState(false)
+
   let _action = submission?.formData.get('_action')
+  let submittingSend = state === 'submitting' && _action === 'send'
 
   if (!problem) {
     return <h1>Not found</h1>
   }
+
+  let canDelete = userId === problem.created_by_id
+  let didLike = problem.likes.some((l) => l.user_id === userId)
+  let didSent = problem.sends.some((l) => l.user_id === userId)
 
   return (
     <Stack spacing={2}>
@@ -79,7 +122,7 @@ export default function ProblemPage() {
       <Form method="post" replace>
         <Stack direction="row" justifyContent="space-between">
           <LoadingButton
-            variant="outlined"
+            variant={didLike ? 'contained' : 'outlined'}
             startIcon={<ThumbUpOutlined />}
             loading={state === 'submitting' && _action === 'like'}
             loadingPosition="start"
@@ -87,8 +130,16 @@ export default function ProblemPage() {
             name="_action"
             value="like"
           >
-            Like ({likes})
+            Like ({problem.likes.length})
           </LoadingButton>
+
+          <Button
+            startIcon={<Check />}
+            variant={didSent ? 'contained' : 'outlined'}
+            onClick={() => toggleSendDialog(true)}
+          >
+            Send
+          </Button>
 
           {canDelete && (
             <LoadingButton
@@ -106,6 +157,30 @@ export default function ProblemPage() {
           )}
         </Stack>
       </Form>
+
+      <Dialog open={isSendDialogOpen || submittingSend} fullWidth>
+        <Form method="post" replace>
+          <DialogTitle>Well done! Tell me more!</DialogTitle>
+
+          <DialogContent>
+            <SendProblemForm {...send} />
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => toggleSendDialog(false)}>Cancel</Button>
+            <LoadingButton
+              type="submit"
+              name="_action"
+              value="send"
+              variant="contained"
+              loading={submittingSend}
+              onClick={() => toggleSendDialog(false)}
+            >
+              Ok
+            </LoadingButton>
+          </DialogActions>
+        </Form>
+      </Dialog>
     </Stack>
   )
 }
