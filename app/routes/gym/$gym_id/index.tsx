@@ -19,6 +19,7 @@ import { Delete, ThumbUp, CheckBox } from '@mui/icons-material'
 import { prisma } from '../../../../lib/prisma'
 import { getUserId, requireUserId } from '../../../session.server'
 import { trImg } from '../../../image'
+import { grades } from '../../../problem/grades'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
@@ -28,7 +29,10 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
         id: true,
         name: true,
         problems: {
-          include: { _count: { select: { likes: true, sends: true } } },
+          include: {
+            sends: { select: { grade: true } },
+            _count: { select: { likes: true } },
+          },
         },
         created_by_id: true,
       },
@@ -81,59 +85,60 @@ export default function GymPage() {
       </Stack>
 
       <List subheader={<ListSubheader>Problems</ListSubheader>}>
-        {gym.problems.map((problem) => (
-          <ListItem
-            key={problem.id}
-            disablePadding
-            secondaryAction={
-              <Stack direction="row" spacing={2}>
-                {problem._count.sends ? (
-                  <Badge
-                    badgeContent={problem._count.sends}
-                    color="secondary"
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                  >
-                    <CheckBox />
-                  </Badge>
-                ) : null}
+        {gym.problems.map((problem) => {
+          let avgSendGrade = Math.ceil(
+            problem.sends.map((s) => s.grade).reduce((s, g) => s + g, 0) /
+              problem.sends.length
+          )
 
-                {problem._count.likes ? (
+          return (
+            <ListItem
+              key={problem.id}
+              disablePadding
+              secondaryAction={
+                <Stack direction="row" spacing={2}>
+                  {problem._count.likes ? (
+                    <Badge
+                      badgeContent={problem._count.likes}
+                      color="success"
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                    >
+                      <ThumbUp />
+                    </Badge>
+                  ) : null}
+                </Stack>
+              }
+            >
+              <ListItemButton component={Link} to={`problem/${problem.id}`}>
+                <ListItemAvatar>
                   <Badge
-                    badgeContent={problem._count.likes}
-                    color="success"
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
+                    badgeContent={
+                      avgSendGrade
+                        ? grades[avgSendGrade].font
+                        : problem.gym_grade
+                    }
+                    color="primary"
                   >
-                    <ThumbUp />
+                    <Avatar variant="rounded" src={trImg(problem.image_url)} />
                   </Badge>
-                ) : null}
-              </Stack>
-            }
-          >
-            <ListItemButton component={Link} to={`problem/${problem.id}`}>
-              <ListItemAvatar>
-                <Badge badgeContent={problem.gym_grade} color="primary">
-                  <Avatar variant="rounded" src={trImg(problem.image_url)} />
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Chip
-                    label={problem.hold_type}
-                    size="small"
-                    style={{ background: problem.color }}
-                  />
-                }
-                secondary={new Date(problem.date).toLocaleDateString()}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Chip
+                      label={problem.hold_type}
+                      size="small"
+                      style={{ background: problem.color }}
+                    />
+                  }
+                  secondary={new Date(problem.date).toLocaleDateString()}
+                />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
       </List>
 
       <Button component={Link} variant="contained" to="problem/new">
