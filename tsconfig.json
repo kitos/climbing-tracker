@@ -9,7 +9,7 @@
     "resolveJsonModule": true,
     "target": "ES2019",
     "strict": true,
-    "baseUrl": "./my-remix-app",
+    "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]
     },

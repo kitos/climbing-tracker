@@ -1,26 +1,11 @@
 import { Form, Link, useLoaderData } from '@remix-run/react'
 import { ActionFunction, redirect } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import {
-  Avatar,
-  Badge,
-  Button,
-  Chip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemText,
-  ListSubheader,
-  Stack,
-  Typography,
-} from '@mui/material'
-import { Delete, ThumbUp } from '@mui/icons-material'
-import { prisma } from '../../../../lib/prisma'
-import { getUserId, requireUserId } from '../../../session.server'
-import { trImg } from '../../../image'
-import { grades } from '../../../problem/grades'
+import { Button, IconButton, Stack, Typography } from '@mui/material'
+import { Delete } from '@mui/icons-material'
+import { prisma } from '~/prisma'
+import { getUserId, requireUserId } from '~/session.server'
+import { ProblemList } from '~/components/ProblemList'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
@@ -87,61 +72,9 @@ export default function GymPage() {
         )}
       </Stack>
 
-      <List subheader={<ListSubheader>Problems</ListSubheader>}>
-        {gym.problems.map((problem) => {
-          let avgSendGrade = Math.ceil(
-            problem.sends.map((s) => s.grade).reduce((s, g) => s + g, 0) /
-              problem.sends.length
-          )
-
-          return (
-            <ListItem
-              key={problem.id}
-              disablePadding
-              secondaryAction={
-                problem._count.likes ? (
-                  <Badge
-                    badgeContent={problem._count.likes}
-                    color="primary"
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                  >
-                    <ThumbUp />
-                  </Badge>
-                ) : null
-              }
-            >
-              <ListItemButton component={Link} to={`problem/${problem.id}`}>
-                <ListItemAvatar>
-                  <Badge
-                    badgeContent={
-                      avgSendGrade
-                        ? grades[avgSendGrade].font
-                        : problem.gym_grade
-                    }
-                    color="primary"
-                  >
-                    <Avatar variant="rounded" src={trImg(problem.image_url)} />
-                  </Badge>
-                </ListItemAvatar>
-
-                <ListItemText
-                  primary={
-                    <Chip
-                      label={problem.hold_type}
-                      size="small"
-                      style={{ background: problem.color }}
-                    />
-                  }
-                  secondary={new Date(problem.date).toLocaleDateString('en-GB')}
-                />
-              </ListItemButton>
-            </ListItem>
-          )
-        })}
-      </List>
+      <ProblemList
+        problems={gym.problems.map((p) => ({ ...p, gymId: gym!.id }))}
+      />
 
       <Button component={Link} variant="contained" to="problem/new">
         Add new problem

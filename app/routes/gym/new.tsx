@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Form, useTransition } from '@remix-run/react'
 import { ActionFunction, LoaderFunction, redirect } from 'remix'
 import { Button, InputAdornment, Stack, TextField } from '@mui/material'
@@ -7,10 +8,9 @@ import {
   PublicOutlined,
   UploadFile,
 } from '@mui/icons-material'
-import { prisma } from '../../../lib/prisma'
-import { requireUserId } from '../../session.server'
-import { useState } from 'react'
-import { Photo } from '../../Photo'
+import { prisma } from '~/prisma'
+import { requireUserId } from '~/session.server'
+import { Photo } from '~/Photo'
 import {
   unstable_createFileUploadHandler as createFileUploadHandler,
   unstable_parseMultipartFormData as parseMultipartFormData,
@@ -63,7 +63,7 @@ export default function NewGym() {
           hidden
         />
 
-        <Button variant="contained" startIcon={<UploadFile />}>
+        <Button variant="contained" startIcon={<UploadFile />} component="span">
           Upload logo
         </Button>
       </label>

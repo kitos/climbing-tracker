@@ -1,6 +1,6 @@
 import { createCookieSessionStorage, redirect } from 'remix'
 import crypto from 'crypto'
-import { prisma } from '../lib/prisma'
+import { prisma } from './prisma'
 import { sign, verify } from './jwt.server'
 import { sendMagicLinkEmail } from './mail.server'
 import invariant from '@remix-run/dev/invariant'

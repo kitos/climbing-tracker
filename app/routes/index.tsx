@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma'
+import { Fragment } from 'react'
 import { Link, useLoaderData } from '@remix-run/react'
 import {
   Avatar,
@@ -14,7 +14,8 @@ import {
   Stack,
 } from '@mui/material'
 import { Landscape, Public } from '@mui/icons-material'
-import { trImg } from '../image'
+import { prisma } from '~/prisma'
+import { trImg } from '~/image'
 
 export let loader = () =>
   prisma.gym.findMany({
@@ -28,9 +29,8 @@ export default function Index() {
     <Stack spacing={2}>
       <List subheader={<ListSubheader>Gyms</ListSubheader>}>
         {gyms.map((gym, i) => (
-          <>
+          <Fragment key={gym.id}>
             <ListItem
-              key={gym.id}
               disablePadding
               secondaryAction={
                 gym.site && (
@@ -58,7 +58,7 @@ export default function Index() {
             </ListItem>
 
             {i < gyms.length - 1 && <Divider component="li" />}
-          </>
+          </Fragment>
         ))}
       </List>
 

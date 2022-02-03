@@ -20,7 +20,7 @@ import {
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { UploadFile } from '@mui/icons-material'
-import { prisma } from '../../../../../lib/prisma'
+import { prisma } from '../../../../prisma'
 import { requireUserId } from '../../../../session.server'
 import { uploadImage } from '../../../imagekitUploader.server'
 import { Photo } from '../../../../Photo'
@@ -86,7 +86,11 @@ export default function NewProblem() {
             name="img"
             hidden
           />
-          <Button variant="contained" startIcon={<UploadFile />}>
+          <Button
+            variant="contained"
+            startIcon={<UploadFile />}
+            component="span"
+          >
             Upload image
           </Button>
         </label>

@@ -12,10 +12,10 @@ import {
 import { LoadingButton } from '@mui/lab'
 import { Check, DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { getUserId, requireUserId } from '../../../../session.server'
-import { trImg } from '../../../../image'
-import { prisma } from '../../../../../lib/prisma'
-import { SendProblemForm } from '../../../../problem/SendProblemForm'
+import { getUserId, requireUserId } from '~/session.server'
+import { trImg } from '~/image'
+import { prisma } from '~/prisma'
+import { SendProblemForm } from '~/components/SendProblemForm'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let problem_id = params.problem_id!

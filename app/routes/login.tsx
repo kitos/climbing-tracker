@@ -7,7 +7,7 @@ import {
 import { Form, useTransition } from '@remix-run/react'
 import { Stack, TextField } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-import { getUserId, initMagicLogin } from '../session.server'
+import { getUserId, initMagicLogin } from '~/session.server'
 
 export let loader: LoaderFunction = async ({ request }) => {
   let userId = await getUserId(request)

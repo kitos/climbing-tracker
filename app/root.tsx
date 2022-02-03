@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import type { MetaFunction } from 'remix'
-import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { Link, useLoaderData, useTransition } from '@remix-run/react'
 import {
   Links,
   LiveReload,
@@ -10,19 +8,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from 'remix'
-import {
-  AppBar,
-  Box,
-  IconButton,
-  LinearProgress,
-  Menu,
-  MenuItem,
-  Toolbar,
-  Typography,
-  CssBaseline,
-} from '@mui/material'
-import { AccountCircle } from '@mui/icons-material'
+import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
+import { useLoaderData, useTransition } from '@remix-run/react'
+import { Box, CssBaseline, LinearProgress } from '@mui/material'
 import { getUserId } from './session.server'
+import { AppBar } from './components/AppBar'
 
 export let meta: MetaFunction = () => {
   return { title: 'Climbing Tracker' }
@@ -38,15 +28,10 @@ export let links = () => [
   },
 ]
 
-let menuId = 'user-menu'
-
 export let loader = ({ request }: DataFunctionArgs) => getUserId(request)
 
 export default function App() {
   let userId = useLoaderData<Awaited<ReturnType<typeof loader>>>()
-  let [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  let closeMenu = () => setAnchorEl(null)
-
   let { state } = useTransition()
   let [tooMuchTimePassed, showProgress] = useState(false)
 
@@ -71,68 +56,7 @@ export default function App() {
       <CssBaseline />
 
       <body>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              sx={{ mr: 2 }}
-            >
-              <Link to="/" style={{ textDecoration: 'none' }}>
-                🧗‍♀️
-              </Link>
-            </IconButton>
-
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ flexGrow: 1 }}
-            >
-              <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Tracker
-              </Link>
-            </Typography>
-
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-
-            <Menu
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              id={menuId}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={closeMenu}
-            >
-              <MenuItem
-                component={Link}
-                to={userId ? '/logout' : '/login'}
-                onClick={closeMenu}
-              >
-                {userId ? 'Logout' : 'Login'}
-              </MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
+        <AppBar userId={userId} />
 
         {state === 'loading' && tooMuchTimePassed && (
           <LinearProgress color="secondary" />

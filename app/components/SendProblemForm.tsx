@@ -11,7 +11,7 @@ import {
   TextField,
 } from '@mui/material'
 import { AddCircle, RemoveCircle } from '@mui/icons-material'
-import { grades } from './grades'
+import { grades } from '~/problem'
 
 export let SendProblemForm = ({
   date: defaultDate = new Date(),

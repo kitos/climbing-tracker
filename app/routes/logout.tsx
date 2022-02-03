@@ -1,5 +1,5 @@
 import { LoaderFunction } from 'remix'
-import { logout } from '../session.server'
+import { logout } from '~/session.server'
 
 export let loader: LoaderFunction = ({ request }) => logout(request)
 

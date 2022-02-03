@@ -1,6 +1,6 @@
 import { LoaderFunction, redirect } from 'remix'
 import { Typography } from '@mui/material'
-import { finishMagicLogin, getUserId } from '../session.server'
+import { finishMagicLogin, getUserId } from '~/session.server'
 
 export let loader: LoaderFunction = async ({ request }) => {
   let userId = await getUserId(request)
