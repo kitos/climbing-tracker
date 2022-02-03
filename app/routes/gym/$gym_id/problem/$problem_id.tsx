@@ -117,7 +117,11 @@ export default function ProblemPage() {
 
   return (
     <Stack spacing={2}>
-      <img src={trImg(problem.image_url, 400)} alt="" />
+      <img
+        src={trImg(problem.image_url, 400)}
+        alt=""
+        style={{ height: 350, objectFit: 'scale-down' }}
+      />
 
       <Form method="post" replace>
         <Stack direction="row" justifyContent="space-between">
