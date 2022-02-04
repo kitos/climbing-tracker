@@ -10,7 +10,7 @@ import {
   ListSubheader,
 } from '@mui/material'
 import { Link } from '@remix-run/react'
-import { grades } from '~/problem'
+import { colors, grades } from '~/problem'
 import { trImg } from '~/image'
 import { formatRelative } from '~/date'
 import { ReactNode } from 'react'
@@ -68,7 +68,11 @@ export let ProblemList = <P extends IProblem>({
                 <Chip
                   label={problem.hold_type}
                   size="small"
-                  style={{ background: problem.color }}
+                  style={{
+                    background: colors.find(
+                      ({ name }) => name === problem.color
+                    )?.hex,
+                  }}
                 />
               }
               secondary={formatRelative(new Date(problem.date), Date.now())}

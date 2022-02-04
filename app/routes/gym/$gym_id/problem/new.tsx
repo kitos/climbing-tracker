@@ -90,9 +90,9 @@ export default function NewProblem() {
             defaultValue=""
             required
           >
-            {colors.map((c) => (
-              <MenuItem key={c} value={c}>
-                <Chip label={c} style={{ background: c }} />
+            {colors.map(({ name, hex }) => (
+              <MenuItem key={name} value={name}>
+                <Chip label={name} style={{ background: hex }} />
               </MenuItem>
             ))}
           </Select>
