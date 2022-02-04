@@ -7,15 +7,26 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
   Stack,
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-import { Check, DeleteOutlined, ThumbUpOutlined } from '@mui/icons-material'
+import {
+  Check,
+  DeleteOutlined,
+  DoneAll,
+  ThumbUpOutlined,
+} from '@mui/icons-material'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { getUserId, requireUserId } from '~/session.server'
 import { trImg } from '~/image'
 import { prisma } from '~/prisma'
 import { SendProblemForm } from '~/components/SendProblemForm'
+import { formatRelative } from 'date-fns'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let problem_id = params.problem_id!
@@ -25,7 +36,13 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
     prisma.problem.findUnique({
       include: {
         likes: { select: { user_id: true } },
-        sends: { select: { user_id: true } },
+        sends: {
+          select: {
+            date: true,
+            grade: true,
+            sender: { select: { id: true, name: true } },
+          },
+        },
       },
       where: { id: problem_id },
     }),
@@ -113,7 +130,7 @@ export default function ProblemPage() {
 
   let canDelete = userId === problem.created_by_id
   let didLike = problem.likes.some((l) => l.user_id === userId)
-  let didSent = problem.sends.some((l) => l.user_id === userId)
+  let didSent = problem.sends.some((l) => l.sender.id === userId)
 
   return (
     <Stack spacing={2}>
@@ -161,6 +178,21 @@ export default function ProblemPage() {
           )}
         </Stack>
       </Form>
+
+      <List subheader={<ListSubheader>Sends</ListSubheader>} dense>
+        {problem.sends.map((send) => (
+          <ListItem key={send.sender.id}>
+            <ListItemIcon>
+              <DoneAll />
+            </ListItemIcon>
+
+            <ListItemText
+              primary={send.sender.name}
+              secondary={formatRelative(new Date(send.date), Date.now())}
+            />
+          </ListItem>
+        ))}
+      </List>
 
       <Dialog open={isSendDialogOpen || submittingSend} fullWidth>
         <Form method="post" replace>
