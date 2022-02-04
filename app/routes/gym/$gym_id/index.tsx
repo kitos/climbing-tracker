@@ -85,7 +85,6 @@ export default function GymPage() {
           return (
             <Badge
               badgeContent={p.sends.length}
-              color="primary"
               anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right',
