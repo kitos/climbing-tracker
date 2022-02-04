@@ -44,7 +44,10 @@ export default function Index() {
                 {
                   <ListItemAvatar>
                     {gym.logo ? (
-                      <Avatar variant="rounded" src={trImg(gym.logo, 80)} />
+                      <Avatar
+                        variant="rounded"
+                        src={trImg(gym.logo, { h: 80 })}
+                      />
                     ) : (
                       <Avatar>
                         <Landscape />

@@ -59,7 +59,10 @@ export let ProblemList = <P extends IProblem>({
                 }
                 color="primary"
               >
-                <Avatar variant="rounded" src={trImg(problem.image_url)} />
+                <Avatar
+                  variant="rounded"
+                  src={trImg(problem.image_url, { h: 80 })}
+                />
               </Badge>
             </ListItemAvatar>
 
