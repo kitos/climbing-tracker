@@ -13,6 +13,7 @@ import {
   ListItemText,
   ListSubheader,
   Stack,
+  Typography,
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import {
@@ -27,6 +28,7 @@ import { trImg } from '~/image'
 import { prisma } from '~/prisma'
 import { SendProblemForm } from '~/components/SendProblemForm'
 import { formatRelative } from '~/date'
+import { GymAvatar } from '~/components/GymAvatar'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let problem_id = params.problem_id!
@@ -35,6 +37,7 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [problem, send] = await Promise.all([
     prisma.problem.findUnique({
       include: {
+        gym: { select: { name: true, logo: true } },
         likes: { select: { user_id: true } },
         sends: {
           select: {
@@ -134,6 +137,14 @@ export default function ProblemPage() {
 
   return (
     <Stack spacing={2}>
+      <Stack direction="row" spacing={2} alignItems="center">
+        <GymAvatar logo={problem.gym.logo} />
+
+        <Typography component="h1" variant="h5">
+          {problem.gym.name}
+        </Typography>
+      </Stack>
+
       <img
         src={trImg(problem.image_url, { h: 400 })}
         alt=""
