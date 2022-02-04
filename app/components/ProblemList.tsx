@@ -14,6 +14,7 @@ import { avgGrade, colors, grades } from '~/problem'
 import { trImg } from '~/image'
 import { formatRelative } from '~/date'
 import { ReactNode } from 'react'
+import { HoldAndColor } from '~/components/HoldAndColor'
 
 interface IProblem {
   id: string
@@ -64,17 +65,7 @@ export let ProblemList = <P extends IProblem>({
             </ListItemAvatar>
 
             <ListItemText
-              primary={
-                <Chip
-                  label={problem.hold_type}
-                  size="small"
-                  style={{
-                    background: colors.find(
-                      ({ name }) => name === problem.color
-                    )?.hex,
-                  }}
-                />
-              }
+              primary={<HoldAndColor {...problem} />}
               secondary={formatRelative(new Date(problem.date), Date.now())}
             />
           </ListItemButton>

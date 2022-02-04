@@ -29,6 +29,8 @@ import { prisma } from '~/prisma'
 import { SendProblemForm } from '~/components/SendProblemForm'
 import { formatRelative } from '~/date'
 import { GymAvatar } from '~/components/GymAvatar'
+import { HoldAndColor } from '~/components/HoldAndColor'
+import { avgGrade, grades } from '~/problem'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let problem_id = params.problem_id!
@@ -134,6 +136,7 @@ export default function ProblemPage() {
   let canDelete = userId === problem.created_by_id
   let didLike = problem.likes.some((l) => l.user_id === userId)
   let didSent = problem.sends.some((l) => l.sender.id === userId)
+  let avgSentGrade = avgGrade(problem.sends)
 
   return (
     <Stack spacing={2}>
@@ -144,12 +147,36 @@ export default function ProblemPage() {
           {problem.gym.name}
         </Typography>
       </Stack>
-
       <img
         src={trImg(problem.image_url, { h: 400 })}
-        alt=""
         style={{ height: 350, objectFit: 'scale-down' }}
       />
+
+      <Stack spacing={1}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant="overline">Set:</Typography>
+          <Typography>
+            {formatRelative(new Date(problem.date), Date.now())}
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant="overline">Holds:</Typography>
+          <HoldAndColor {...problem} />
+        </Stack>
+
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant="overline">Gym grade:</Typography>
+          <Typography>{problem.gym_grade}</Typography>
+        </Stack>
+
+        {avgSentGrade && (
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="overline">Avg sent grade:</Typography>
+            <Typography>{grades[avgSentGrade].font}</Typography>
+          </Stack>
+        )}
+      </Stack>
 
       <Form method="post" replace>
         <Stack direction="row" justifyContent="space-between">
