@@ -9,10 +9,11 @@ import {
   ListItemText,
   ListSubheader,
 } from '@mui/material'
-import { ThumbUp } from '@mui/icons-material'
 import { Link } from '@remix-run/react'
 import { grades } from '~/problem'
 import { trImg } from '~/image'
+import { formatRelative } from '~/date'
+import { ReactNode } from 'react'
 
 interface IProblem {
   id: string
@@ -23,15 +24,16 @@ interface IProblem {
   color: string
   date: Date
   sends: { grade: number }[]
-  _count: { likes: number }
 }
 
-export let ProblemList = ({
+export let ProblemList = <P extends IProblem>({
   header = 'Problems',
   problems,
+  renderSecondaryAction,
 }: {
   header?: string
-  problems: IProblem[]
+  problems: P[]
+  renderSecondaryAction?: (p: P) => ReactNode
 }) => (
   <List subheader={<ListSubheader>{header}</ListSubheader>}>
     {problems.map((problem) => {
@@ -44,20 +46,7 @@ export let ProblemList = ({
         <ListItem
           key={problem.id}
           disablePadding
-          secondaryAction={
-            problem._count.likes ? (
-              <Badge
-                badgeContent={problem._count.likes}
-                color="primary"
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-              >
-                <ThumbUp />
-              </Badge>
-            ) : null
-          }
+          secondaryAction={renderSecondaryAction?.(problem)}
         >
           <ListItemButton
             component={Link}
@@ -82,7 +71,7 @@ export let ProblemList = ({
                   style={{ background: problem.color }}
                 />
               }
-              secondary={new Date(problem.date).toLocaleDateString('en-GB')}
+              secondary={formatRelative(new Date(problem.date), Date.now())}
             />
           </ListItemButton>
         </ListItem>

@@ -20,10 +20,11 @@ import {
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { UploadFile } from '@mui/icons-material'
-import { prisma } from '../../../../prisma'
-import { requireUserId } from '../../../../session.server'
-import { uploadImage } from '../../../imagekitUploader.server'
-import { Photo } from '../../../../Photo'
+import { prisma } from '~/prisma'
+import { requireUserId } from '~/session.server'
+import { uploadImage } from '~/routes/imagekitUploader.server'
+import { Photo } from '~/Photo'
+import { colors, holdTypes } from '~/problem'
 
 export let loader: LoaderFunction = ({ request }) => requireUserId(request)
 
@@ -53,21 +54,6 @@ export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
 
   return redirect(`/gym/${gym_id}`)
 }
-
-const colors = [
-  'yellow',
-  'magenta',
-  'red',
-  'orange',
-  'green',
-  'cyan',
-  'blue',
-  'purple',
-  'gray',
-  'black',
-]
-
-const holdTypes = ['jug', 'crimp', 'pinch', 'sloper', 'pocket', 'volume']
 
 export default function NewProblem() {
   let { state } = useTransition()

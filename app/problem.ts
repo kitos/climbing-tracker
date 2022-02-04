@@ -23,3 +23,18 @@ export let grades = [
   { v: 'V16', font: '8c+' },
   { v: 'V17', font: '9a' },
 ]
+
+export const colors = [
+  'yellow',
+  'magenta',
+  'red',
+  'orange',
+  'green',
+  'cyan',
+  'blue',
+  'purple',
+  'gray',
+  'black',
+]
+
+export const holdTypes = ['jug', 'crimp', 'pinch', 'sloper', 'pocket', 'volume']

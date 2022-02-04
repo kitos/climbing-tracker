@@ -26,7 +26,7 @@ import { getUserId, requireUserId } from '~/session.server'
 import { trImg } from '~/image'
 import { prisma } from '~/prisma'
 import { SendProblemForm } from '~/components/SendProblemForm'
-import { formatRelative } from 'date-fns'
+import { formatRelative } from '~/date'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let problem_id = params.problem_id!
