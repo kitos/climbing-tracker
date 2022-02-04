@@ -10,7 +10,7 @@ import {
   ListSubheader,
 } from '@mui/material'
 import { Link } from '@remix-run/react'
-import { colors, grades } from '~/problem'
+import { avgGrade, colors, grades } from '~/problem'
 import { trImg } from '~/image'
 import { formatRelative } from '~/date'
 import { ReactNode } from 'react'
@@ -27,7 +27,7 @@ interface IProblem {
 }
 
 export let ProblemList = <P extends IProblem>({
-  header = 'Problems',
+  header,
   problems,
   renderSecondaryAction,
 }: {
@@ -35,12 +35,9 @@ export let ProblemList = <P extends IProblem>({
   problems: P[]
   renderSecondaryAction?: (p: P) => ReactNode
 }) => (
-  <List subheader={<ListSubheader>{header}</ListSubheader>}>
+  <List subheader={header && <ListSubheader>{header}</ListSubheader>}>
     {problems.map((problem) => {
-      let avgSendGrade = Math.ceil(
-        problem.sends.map((s) => s.grade).reduce((s, g) => s + g, 0) /
-          problem.sends.length
-      )
+      let avgSendGrade = avgGrade(problem.sends)
 
       return (
         <ListItem

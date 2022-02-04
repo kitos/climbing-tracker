@@ -74,6 +74,7 @@ export default function GymPage() {
       </Stack>
 
       <ProblemList
+        header="Problems"
         problems={gym.problems.map((p) => ({ ...p, gymId: gym!.id }))}
         renderSecondaryAction={(p) => {
           if (p.sends.length === 0) {
