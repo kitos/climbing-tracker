@@ -197,7 +197,7 @@ export default function ProblemPage() {
             variant={didSent ? 'contained' : 'outlined'}
             onClick={() => toggleSendDialog(true)}
           >
-            Send
+            Send ({problem.sends.length})
           </Button>
 
           {canDelete && (
