@@ -16,6 +16,7 @@ import {
 import { Landscape, Public } from '@mui/icons-material'
 import { prisma } from '~/prisma'
 import { trImg } from '~/image'
+import { GymAvatar } from '~/components/GymAvatar'
 
 export let loader = () =>
   prisma.gym.findMany({
@@ -43,16 +44,7 @@ export default function Index() {
               <ListItemButton component={Link} to={`/gym/${gym.id}`}>
                 {
                   <ListItemAvatar>
-                    {gym.logo ? (
-                      <Avatar
-                        variant="rounded"
-                        src={trImg(gym.logo, { h: 80 })}
-                      />
-                    ) : (
-                      <Avatar>
-                        <Landscape />
-                      </Avatar>
-                    )}
+                    <GymAvatar logo={gym.logo} />
                   </ListItemAvatar>
                 }
 

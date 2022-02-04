@@ -6,6 +6,7 @@ import { Delete, Done, DoneAll } from '@mui/icons-material'
 import { prisma } from '~/prisma'
 import { getUserId, requireUserId } from '~/session.server'
 import { ProblemList } from '~/components/ProblemList'
+import { GymAvatar } from '~/components/GymAvatar'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [userId, gym] = await Promise.all([
@@ -14,6 +15,7 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
       select: {
         id: true,
         name: true,
+        logo: true,
         problems: {
           include: {
             sends: { select: { user_id: true, grade: true } },
@@ -60,6 +62,8 @@ export default function GymPage() {
   return (
     <Stack spacing={2}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <GymAvatar logo={gym.logo} />
+
         <Typography component="h1" variant="h5">
           {gym.name}
         </Typography>
