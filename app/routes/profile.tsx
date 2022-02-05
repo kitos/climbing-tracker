@@ -48,7 +48,7 @@ export let loader = async ({ request }: DataFunctionArgs) => {
   ])
 
   let avgGradeYear = Math.round(avg(yearStats.map((y) => y._avg.grade!)))
-  let topGradeYear = Math.max(...yearStats.map((y) => y._max.grade!))
+  let topGradeYear = Math.max(0, ...yearStats.map((y) => y._max.grade!))
 
   if (!user) {
     await logout(request)
@@ -96,7 +96,7 @@ export default function ProfilePage() {
         {...stats}
         sentMonth={user.sends.length}
         avgGradeMonth={avgGrade(user.sends)}
-        topGradeMonth={Math.max(...user.sends.map((s) => s.grade))}
+        topGradeMonth={Math.max(0, ...user.sends.map((s) => s.grade))}
       />
 
       <Divider variant="middle">Sent this month</Divider>
