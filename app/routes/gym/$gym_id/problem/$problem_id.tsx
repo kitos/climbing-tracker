@@ -170,12 +170,12 @@ export default function ProblemPage() {
           <Typography>{problem.gym_grade}</Typography>
         </Stack>
 
-        {avgSentGrade && (
+        {avgSentGrade ? (
           <Stack direction="row" alignItems="center" spacing={1}>
             <Typography variant="overline">Avg sent grade:</Typography>
             <Typography>{grades[avgSentGrade].font}</Typography>
           </Stack>
-        )}
+        ) : null}
       </Stack>
 
       <Form method="post" replace>
