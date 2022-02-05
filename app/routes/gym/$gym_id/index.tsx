@@ -1,8 +1,15 @@
 import { Form, Link, useLoaderData } from '@remix-run/react'
 import { ActionFunction, redirect } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
-import { Badge, Button, IconButton, Stack, Typography } from '@mui/material'
-import { Delete, Done, DoneAll } from '@mui/icons-material'
+import {
+  Badge,
+  Button,
+  IconButton,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material'
+import { Add, Delete, Done, DoneAll } from '@mui/icons-material'
 import { prisma } from '~/prisma'
 import { getUserId, requireUserId } from '~/session.server'
 import { ProblemList } from '~/components/ProblemList'
@@ -105,9 +112,27 @@ export default function GymPage() {
         }}
       />
 
-      <Button component={Link} variant="contained" to="problem/new">
-        Add new problem
-      </Button>
+      <Paper
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: 2,
+          zIndex: 1,
+        }}
+        elevation={3}
+      >
+        <Button
+          component={Link}
+          startIcon={<Add />}
+          variant="contained"
+          to="problem/new"
+          fullWidth
+        >
+          Add new problem
+        </Button>
+      </Paper>
     </Stack>
   )
 }

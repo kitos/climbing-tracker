@@ -11,9 +11,10 @@ import {
   ListItemButton,
   ListItemText,
   ListSubheader,
+  Paper,
   Stack,
 } from '@mui/material'
-import { Landscape, Public } from '@mui/icons-material'
+import { Add, Landscape, Public } from '@mui/icons-material'
 import { prisma } from '~/prisma'
 import { trImg } from '~/image'
 import { GymAvatar } from '~/components/GymAvatar'
@@ -57,9 +58,27 @@ export default function Index() {
         ))}
       </List>
 
-      <Button component={Link} variant="contained" to="/gym/new">
-        Add new gym
-      </Button>
+      <Paper
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: 2,
+          zIndex: 1,
+        }}
+        elevation={3}
+      >
+        <Button
+          component={Link}
+          startIcon={<Add />}
+          variant="contained"
+          to="/gym/new"
+          fullWidth
+        >
+          Add new gym
+        </Button>
+      </Paper>
     </Stack>
   )
 }
