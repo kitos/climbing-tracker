@@ -9,10 +9,13 @@ import {
 } from 'remix'
 import {
   Button,
+  Checkbox,
   Chip,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Slider,
   Stack,
@@ -25,11 +28,12 @@ import { requireUserId } from '~/session.server'
 import { uploadImage } from '~/routes/imagekitUploader.server'
 import { Photo } from '~/Photo'
 import { colors, holdTypes } from '~/problem'
+import { SendProblemForm } from '~/components/SendProblemForm'
 
 export let loader: LoaderFunction = ({ request }) => requireUserId(request)
 
 export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
-  let userId = await requireUserId(request)
+  let user_id = await requireUserId(request)
 
   let formData = await parseMultipartFormData(
     request,
@@ -38,10 +42,11 @@ export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
   let img = formData.get('img') as any
   let cdnImage = await uploadImage(img.name, img.stream())
 
-  await prisma.problem.create({
+  let { id: problem_id } = await prisma.problem.create({
+    select: { id: true },
     data: {
       gym: { connect: { id: gym_id! } },
-      created_by: { connect: { id: userId } },
+      created_by: { connect: { id: user_id } },
       date: new Date(),
       image_url: cdnImage.url,
       color: formData.get('color') as string,
@@ -52,12 +57,25 @@ export let action: ActionFunction = async ({ params: { gym_id }, request }) => {
     },
   })
 
-  return redirect(`/gym/${gym_id}`)
+  if (formData.get('sent_it') === 'on') {
+    await prisma.send.create({
+      data: {
+        problem_id,
+        user_id,
+        date: new Date(formData.get('send_date') as string),
+        grade: parseInt(formData.get('send_grade') as string),
+        attempts: formData.get('send_attempts') as string,
+      },
+    })
+  }
+
+  return redirect(`/gym/${gym_id}/problem/${problem_id}`)
 }
 
 export default function NewProblem() {
   let { state } = useTransition()
   let [img, setImg] = useState<File>()
+  let [didSend, toggleSend] = useState(false)
 
   return (
     <RemixForm method="post" encType="multipart/form-data">
@@ -82,10 +100,10 @@ export default function NewProblem() {
         </label>
 
         <FormControl fullWidth>
-          <InputLabel id="color-label">Color</InputLabel>
+          <InputLabel id="color-label">Holds color</InputLabel>
           <Select
             labelId="color-label"
-            label="Color"
+            label="Holds color"
             name="color"
             defaultValue=""
             required
@@ -130,6 +148,22 @@ export default function NewProblem() {
             ))}
           </Select>
         </FormControl>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="sent_it"
+              onChange={(e) => toggleSend(e.target.checked)}
+            />
+          }
+          label="Sent it"
+        />
+
+        {didSend && (
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <SendProblemForm namePrefix="send_" />
+          </Paper>
+        )}
 
         <LoadingButton
           type="submit"

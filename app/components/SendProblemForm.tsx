@@ -17,6 +17,7 @@ export let SendProblemForm = ({
   date: defaultDate = new Date(),
   attempts: defaultAttempts = 'flash',
   grade: defaultGrade = Math.round(grades.length / 2),
+  namePrefix = '',
 }) => {
   let [grade, setGrade] = useState(defaultGrade)
 
@@ -24,7 +25,7 @@ export let SendProblemForm = ({
     <Stack spacing={2} paddingTop={1}>
       <TextField
         type="date"
-        name="date"
+        name={namePrefix + 'date'}
         defaultValue={new Date(defaultDate).toISOString().substring(0, 10)}
         label="When was it?"
         variant="outlined"
@@ -36,7 +37,7 @@ export let SendProblemForm = ({
         <RadioGroup
           aria-labelledby="attempts-label"
           defaultValue={defaultAttempts}
-          name="attempts"
+          name={namePrefix + 'attempts'}
         >
           <FormControlLabel control={<Radio />} label="Flashed" value="flash" />
           <FormControlLabel
@@ -56,6 +57,7 @@ export let SendProblemForm = ({
           />
         </RadioGroup>
       </FormControl>
+
       <FormControl>
         <FormLabel id="grade-label">What about grade?</FormLabel>
 
@@ -70,7 +72,7 @@ export let SendProblemForm = ({
           </IconButton>
 
           <Slider
-            name="grade"
+            name={namePrefix + 'grade'}
             aria-labelledby="grade-label"
             min={0}
             max={grades.length - 1}
