@@ -39,5 +39,8 @@ export const colors = [
 
 export const holdTypes = ['jug', 'crimp', 'pinch', 'sloper', 'pocket', 'volume']
 
+export let avg = (values: number[]) =>
+  values.reduce((sum, v) => sum + v, 0) / values.length
+
 export let avgGrade = (sends: { grade: number }[]) =>
-  Math.ceil(sends.map((s) => s.grade).reduce((s, g) => s + g, 0) / sends.length)
+  Math.round(avg(sends.map((s) => s.grade)))

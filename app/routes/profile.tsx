@@ -8,21 +8,13 @@ import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import { logout, requireUserId } from '~/session.server'
 import { ProblemList } from '~/components/ProblemList'
 import { prisma } from '~/prisma'
-import { avgGrade, grades } from '~/problem'
+import { avg, avgGrade, grades } from '~/problem'
 
 export let loader = async ({ request }: DataFunctionArgs) => {
   let id = await requireUserId(request)
   let now = Date.now()
-  let inThisYear = { where: { user_id: id, date: { gt: startOfYear(now) } } }
 
-  let [
-    user,
-    sentYear,
-    {
-      _avg: { grade: avgGradeYear },
-      _max: { grade: topGradeYear },
-    },
-  ] = await Promise.all([
+  let [user, yearStats] = await Promise.all([
     prisma.user.findUnique({
       select: {
         id: true,
@@ -43,19 +35,26 @@ export let loader = async ({ request }: DataFunctionArgs) => {
       },
       where: { id },
     }),
-    prisma.send.count(inThisYear),
-    prisma.send.aggregate({
+    prisma.send.groupBy({
+      by: ['problem_id'],
+      where: {
+        problem: {
+          sends: { some: { user_id: id, date: { gt: startOfYear(now) } } },
+        },
+      },
       _avg: { grade: true },
       _max: { grade: true },
-      ...inThisYear,
     }),
   ])
+
+  let avgGradeYear = Math.round(avg(yearStats.map((y) => y._avg.grade!)))
+  let topGradeYear = Math.max(...yearStats.map((y) => y._max.grade!))
 
   if (!user) {
     await logout(request)
   }
 
-  return { user, sentYear, avgGradeYear, topGradeYear }
+  return { user, sentYear: yearStats.length, avgGradeYear, topGradeYear }
 }
 
 export let action: ActionFunction = async ({ request }) => {
