@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ActionFunction, redirect } from 'remix'
-import { Form, useLoaderData, useTransition } from '@remix-run/react'
+import { Form, Link, useLoaderData, useTransition } from '@remix-run/react'
 import {
   Button,
   Dialog,
@@ -39,7 +39,7 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
   let [problem, send] = await Promise.all([
     prisma.problem.findUnique({
       include: {
-        gym: { select: { name: true, logo: true } },
+        gym: { select: { id: true, name: true, logo: true } },
         likes: { select: { user_id: true } },
         sends: {
           select: {
@@ -140,13 +140,21 @@ export default function ProblemPage() {
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack
+        component={Link}
+        to={`/gym/${problem.gym.id}`}
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ textDecoration: 'none', color: 'inherit' }}
+      >
         <GymAvatar logo={problem.gym.logo} />
 
         <Typography component="h1" variant="h5">
           {problem.gym.name}
         </Typography>
       </Stack>
+
       <img
         src={trImg(problem.image_url, { h: 400 })}
         style={{ height: 350, objectFit: 'scale-down' }}

@@ -69,11 +69,13 @@ export default function GymPage() {
   return (
     <Stack spacing={2}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <GymAvatar logo={gym.logo} />
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <GymAvatar logo={gym.logo} />
 
-        <Typography component="h1" variant="h5">
-          {gym.name}
-        </Typography>
+          <Typography component="h1" variant="h5">
+            {gym.name}
+          </Typography>
+        </Stack>
 
         {canDelete && (
           <Form method="delete">
