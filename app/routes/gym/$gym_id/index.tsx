@@ -67,7 +67,7 @@ export default function GymPage() {
   let canDelete = userId === gym.created_by_id
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} mb={6}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Stack direction="row" alignItems="center" spacing={2}>
           <GymAvatar logo={gym.logo} />

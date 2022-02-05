@@ -28,7 +28,7 @@ export default function Index() {
   let gyms = useLoaderData<Awaited<ReturnType<typeof loader>>>()
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} mb={6}>
       <List subheader={<ListSubheader>Gyms</ListSubheader>}>
         {gyms.map((gym, i) => (
           <Fragment key={gym.id}>
