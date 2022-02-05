@@ -55,7 +55,7 @@ export let ProblemList = <P extends IProblem>({
                 badgeContent={
                   avgSendGrade ? grades[avgSendGrade].font : problem.gym_grade
                 }
-                color="primary"
+                color={avgSendGrade ? 'primary' : 'secondary'}
               >
                 <Avatar
                   variant="rounded"
