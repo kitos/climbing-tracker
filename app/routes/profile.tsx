@@ -16,14 +16,13 @@ export let loader = async ({ request }: DataFunctionArgs) => {
   let inThisYear = { where: { user_id: id, date: { gt: startOfYear(now) } } }
 
   let [
+    user,
     sentYear,
     {
       _avg: { grade: avgGradeYear },
+      _max: { grade: topGradeYear },
     },
-    user,
   ] = await Promise.all([
-    prisma.send.count(inThisYear),
-    prisma.send.aggregate({ _avg: { grade: true }, ...inThisYear }),
     prisma.user.findUnique({
       select: {
         id: true,
@@ -44,13 +43,19 @@ export let loader = async ({ request }: DataFunctionArgs) => {
       },
       where: { id },
     }),
+    prisma.send.count(inThisYear),
+    prisma.send.aggregate({
+      _avg: { grade: true },
+      _max: { grade: true },
+      ...inThisYear,
+    }),
   ])
 
   if (!user) {
     await logout(request)
   }
 
-  return { user, sentYear, avgGradeYear }
+  return { user, sentYear, avgGradeYear, topGradeYear }
 }
 
 export let action: ActionFunction = async ({ request }) => {
@@ -65,8 +70,7 @@ export let action: ActionFunction = async ({ request }) => {
 }
 
 export default function ProfilePage() {
-  let { user, sentYear, avgGradeYear } =
-    useLoaderData<Awaited<ReturnType<typeof loader>>>()
+  let { user, ...stats } = useLoaderData<Awaited<ReturnType<typeof loader>>>()
   let { state } = useTransition()
 
   if (!user) {
@@ -90,10 +94,10 @@ export default function ProfilePage() {
       <Divider variant="middle">Stats</Divider>
 
       <Stats
+        {...stats}
         sentMonth={user.sends.length}
-        sentYear={sentYear}
         avgGradeMonth={avgGrade(user.sends)}
-        avgGradeYear={avgGradeYear}
+        topGradeMonth={Math.max(...user.sends.map((s) => s.grade))}
       />
 
       <Divider variant="middle">Sent this month</Divider>
@@ -109,17 +113,20 @@ export default function ProfilePage() {
   )
 }
 
-let Stats = ({
-  sentMonth,
-  sentYear,
-  avgGradeMonth,
-  avgGradeYear,
-}: {
-  sentMonth?: number | null
-  sentYear?: number | null
-  avgGradeMonth?: number | null
-  avgGradeYear?: number | null
-}) => (
+type AbsPartial<T> = {
+  [P in keyof T]?: T[P] | null
+}
+
+let Stats = (
+  props: AbsPartial<{
+    sentMonth: number
+    sentYear: number
+    avgGradeMonth: number
+    avgGradeYear: number
+    topGradeMonth: number
+    topGradeYear: number
+  }>
+) => (
   <Box sx={{ flexGrow: 1 }}>
     <Grid container spacing={1}>
       <Grid container item spacing={3}>
@@ -132,33 +139,39 @@ let Stats = ({
         </Grid>
       </Grid>
 
-      <Grid container item spacing={3}>
-        <Grid item xs={4}>
-          <Typography variant="overline">Sent</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="body1">{sentMonth ?? '-'}</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="body1">{sentYear ?? '-'}</Typography>
-        </Grid>
-      </Grid>
+      <StatsRow metric="Sent" month={props.sentMonth} year={props.sentYear} />
 
-      <Grid container item spacing={3}>
-        <Grid item xs={4}>
-          <Typography variant="overline">Avg grade</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="body1">
-            {avgGradeMonth ? grades[avgGradeMonth].font : '-'}
-          </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="body1">
-            {avgGradeYear ? grades[avgGradeYear].font : '-'}
-          </Typography>
-        </Grid>
-      </Grid>
+      <StatsRow
+        metric="Avg grade"
+        month={props.avgGradeMonth && grades[props.avgGradeMonth].font}
+        year={props.avgGradeYear && grades[props.avgGradeYear].font}
+      />
+
+      <StatsRow
+        metric="Top grade"
+        month={props.topGradeMonth && grades[props.topGradeMonth].font}
+        year={props.topGradeYear && grades[props.topGradeYear].font}
+      />
     </Grid>
   </Box>
+)
+
+let StatsRow = (
+  props: AbsPartial<{
+    metric: string
+    month: number | string
+    year: number | string
+  }>
+) => (
+  <Grid container item spacing={3}>
+    <Grid item xs={4}>
+      <Typography variant="overline">{props.metric}</Typography>
+    </Grid>
+    <Grid item xs={4}>
+      <Typography variant="body1">{props.month || '-'}</Typography>
+    </Grid>
+    <Grid item xs={4}>
+      <Typography variant="body1">{props.year || '-'}</Typography>
+    </Grid>
+  </Grid>
 )
