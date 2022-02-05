@@ -25,16 +25,16 @@ export let grades = [
 ]
 
 export const colors = [
-  { name: 'yellow', hex: '#ffef62' },
-  { name: 'red', hex: '#f6685e' },
-  { name: 'orange', hex: '#ffac33' },
-  { name: 'green', hex: '#6fbf73' },
-  { name: 'cyan', hex: '#33c9dc' },
-  { name: 'blue', hex: '#2196f3' },
-  { name: 'purple', hex: '#af52bf' },
-  { name: 'white', hex: '#fff' },
-  { name: 'gray', hex: '#9c9c9c' },
-  { name: 'black', hex: '#000' },
+  { name: 'gray', hex: '#9c9c9c', textColor: '#000' },
+  { name: 'yellow', hex: '#ffef62', textColor: '#000' },
+  { name: 'red', hex: '#f6685e', textColor: '#000' },
+  { name: 'orange', hex: '#ffac33', textColor: '#000' },
+  { name: 'green', hex: '#6fbf73', textColor: '#000' },
+  { name: 'cyan', hex: '#33c9dc', textColor: '#000' },
+  { name: 'blue', hex: '#2196f3', textColor: '#000' },
+  { name: 'purple', hex: '#af52bf', textColor: '#fff' },
+  { name: 'white', hex: '#fff', textColor: '#000' },
+  { name: 'black', hex: '#212121', textColor: '#fff' },
 ]
 
 export const holdTypes = ['jug', 'crimp', 'pinch', 'sloper', 'pocket', 'volume']

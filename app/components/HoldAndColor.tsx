@@ -7,10 +7,19 @@ export let HoldAndColor = ({
 }: {
   hold_type?: string | null
   color: string
-}) => (
-  <Chip
-    label={hold_type?.split(',').join(' & ')}
-    size="small"
-    style={{ background: colors.find(({ name }) => name === color)?.hex }}
-  />
-)
+}) => {
+  let { hex, textColor } =
+    colors.find(({ name }) => name === color) ?? colors[0]
+
+  return (
+    <Chip
+      label={hold_type?.split(',').join(' & ')}
+      size="small"
+      sx={{
+        background: hex,
+        color: textColor,
+        border: color === 'white' ? '1px solid gray' : undefined,
+      }}
+    />
+  )
+}
