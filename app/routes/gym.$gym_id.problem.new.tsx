@@ -4,8 +4,8 @@ import {
   ActionFunction,
   LoaderFunction,
   redirect,
-  unstable_parseMultipartFormData as parseMultipartFormData,
   unstable_createFileUploadHandler as createFileUploadHandler,
+  unstable_parseMultipartFormData as parseMultipartFormData,
 } from 'remix'
 import {
   Button,
@@ -29,6 +29,7 @@ import { uploadImage } from '~/imagekitUploader.server'
 import { Photo } from '~/Photo'
 import { colors, holdTypes } from '~/problem'
 import { SendProblemForm } from '~/components/SendProblemForm'
+import { MAX_GYM_GRADE, MIN_GYM_GRADE } from '~/filters'
 
 export let loader: LoaderFunction = ({ request }) => requireUserId(request)
 
@@ -125,8 +126,8 @@ export default function NewProblem() {
             aria-labelledby="gym-grade-label"
             name="gym_grade"
             marks
-            min={1}
-            max={8}
+            min={MIN_GYM_GRADE}
+            max={MAX_GYM_GRADE}
             defaultValue={4}
             valueLabelDisplay="on"
             track={false}

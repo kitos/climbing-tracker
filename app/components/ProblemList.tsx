@@ -2,12 +2,14 @@ import {
   Avatar,
   Badge,
   Chip,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
   ListSubheader,
+  Stack,
 } from '@mui/material'
 import { Link } from '@remix-run/react'
 import { avgGrade, colors, grades } from '~/problem'
@@ -15,6 +17,7 @@ import { trImg } from '~/image'
 import { formatRelative } from '~/date'
 import { ReactNode } from 'react'
 import { HoldAndColor } from '~/components/HoldAndColor'
+import { FilterList } from '@mui/icons-material'
 
 interface IProblem {
   id: string
@@ -32,7 +35,7 @@ export let ProblemList = <P extends IProblem>({
   problems,
   renderSecondaryAction,
 }: {
-  header?: string
+  header?: ReactNode
   problems: P[]
   renderSecondaryAction?: (p: P) => ReactNode
 }) => (

@@ -1,39 +1,54 @@
 import { Form, Link, useLoaderData } from '@remix-run/react'
-import { ActionFunction, redirect } from 'remix'
+import { ActionFunction, redirect, useSearchParams } from 'remix'
 import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
 import {
   Badge,
   Button,
+  Drawer,
   IconButton,
   Paper,
   Stack,
   Typography,
 } from '@mui/material'
-import { Add, Delete, Done, DoneAll } from '@mui/icons-material'
+import { Add, Delete, Done, DoneAll, FilterList } from '@mui/icons-material'
 import { prisma } from '~/prisma'
 import { getUserId, requireUserId } from '~/session.server'
 import { ProblemList } from '~/components/ProblemList'
 import { GymAvatar } from '~/components/GymAvatar'
+import { useCallback, useState } from 'react'
+import { ProblemFilters } from '~/components/ProblemFilters'
+import { IProblemFilter, isDefaultGymGrade, parseGymGrade } from '~/filters'
+import { unstable_debounce as debounce } from '@mui/utils'
 
 export let loader = async ({ request, params }: DataFunctionArgs) => {
-  let [userId, gym] = await Promise.all([
-    getUserId(request),
-    prisma.gym.findUnique({
-      select: {
-        id: true,
-        name: true,
-        logo: true,
-        problems: {
-          include: {
-            sends: { select: { user_id: true, grade: true } },
-          },
-          orderBy: { date: 'desc' },
+  let { hide_sent, gym_grade } = Object.fromEntries(
+    new URL(request.url).searchParams
+  )
+  let [minGymGrade, maxGymGrade] = parseGymGrade(gym_grade ?? '')
+
+  let userId = await getUserId(request)
+  let gym = await prisma.gym.findUnique({
+    select: {
+      id: true,
+      name: true,
+      logo: true,
+      problems: {
+        include: { sends: { select: { user_id: true, grade: true } } },
+        where: {
+          AND: [
+            { gym_grade: { gte: String(minGymGrade) } },
+            { gym_grade: { lte: String(maxGymGrade) } },
+          ],
+          ...(userId && hide_sent === 'true'
+            ? { sends: { none: { user_id: userId } } }
+            : null),
         },
-        created_by_id: true,
+        orderBy: { date: 'desc' },
       },
-      where: { id: params.gym_id },
-    }),
-  ])
+      created_by_id: true,
+    },
+    where: { id: params.gym_id },
+  })
 
   return { userId, gym }
 }
@@ -60,6 +75,22 @@ type IGym = Awaited<ReturnType<typeof loader>>
 
 export default function GymPage() {
   let { userId, gym } = useLoaderData<IGym>()
+  let [filtersOpen, toggleFilters] = useState(false)
+  let [searchParams, setSearchParams] = useSearchParams()
+  let debouncedSetSearchParams = useCallback(debounce(setSearchParams, 300), [])
+  let [filterValues, setFilters] = useState(
+    () =>
+      Object.fromEntries(searchParams) as Record<IProblemFilter, string | null>
+  )
+  let isSomeFilterActive =
+    !isDefaultGymGrade(parseGymGrade(filterValues.gym_grade ?? '')) ||
+    filterValues.hide_sent === 'true'
+
+  let setFilter = (name: IProblemFilter, value: string) => {
+    let newFilters = { ...filterValues, [name]: value }
+    setFilters(newFilters)
+    debouncedSetSearchParams(newFilters as any)
+  }
 
   if (!gym) {
     return null
@@ -88,7 +119,28 @@ export default function GymPage() {
       </Stack>
 
       <ProblemList
-        header="Problems"
+        header={
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <span>Problems</span>
+
+            <IconButton
+              aria-label="Open filters"
+              onClick={() => toggleFilters(true)}
+            >
+              <Badge
+                color="primary"
+                variant="dot"
+                invisible={!isSomeFilterActive}
+              >
+                <FilterList />
+              </Badge>
+            </IconButton>
+          </Stack>
+        }
         problems={gym.problems.map((p) => ({ ...p, gymId: gym!.id }))}
         renderSecondaryAction={(p) => {
           if (p.sends.length === 0) {
@@ -136,6 +188,15 @@ export default function GymPage() {
           Add new problem
         </Button>
       </Paper>
+
+      <Drawer
+        anchor="bottom"
+        open={filtersOpen}
+        onClose={() => toggleFilters(false)}
+        sx={{ minWidth: '80vw', [`& .MuiDrawer-paper`]: { minWidth: '80vw' } }}
+      >
+        <ProblemFilters values={filterValues} onChange={setFilter} />
+      </Drawer>
     </Stack>
   )
 }
