@@ -245,7 +245,9 @@ export default function ProblemPage() {
           <DialogTitle>Well done! Tell me more!</DialogTitle>
 
           <DialogContent>
-            <SendProblemForm {...send} />
+            <SendProblemForm
+              {...(send ?? (avgSentGrade ? { grade: avgSentGrade } : null))}
+            />
           </DialogContent>
 
           <DialogActions>
