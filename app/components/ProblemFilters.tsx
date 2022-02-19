@@ -46,7 +46,7 @@ export let ProblemFilters = ({
     <FormControlLabel
       control={
         <Checkbox
-          value={hide_sent === 'true'}
+          checked={hide_sent === 'true'}
           onChange={(e) => onChange('hide_sent', String(e.target.checked))}
         />
       }
