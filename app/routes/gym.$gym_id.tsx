@@ -27,6 +27,7 @@ export let loader = async ({ request, params }: DataFunctionArgs) => {
           include: {
             sends: { select: { user_id: true, grade: true } },
           },
+          orderBy: { date: 'desc' },
         },
         created_by_id: true,
       },
