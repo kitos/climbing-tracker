@@ -30,7 +30,7 @@ export let loader = async ({ request }: DataFunctionArgs) => {
               },
             },
           },
-          where: { date: { gt: startOfMonth(now) } },
+          where: { date: { gte: startOfMonth(now) } },
         },
       },
       where: { id },
@@ -39,7 +39,7 @@ export let loader = async ({ request }: DataFunctionArgs) => {
       by: ['problem_id'],
       where: {
         problem: {
-          sends: { some: { user_id: id, date: { gt: startOfYear(now) } } },
+          sends: { some: { user_id: id, date: { gte: startOfYear(now) } } },
         },
       },
       _avg: { grade: true },
