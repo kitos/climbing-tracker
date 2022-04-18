@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "remix setup node && npx patch-package",
     "dev": "remix dev",
-    "build": "PRISMA_CLIENT_ENGINE_TYPE='dataproxy' prisma generate && remix build",
+    "build": "prisma generate && remix build",
     "init": "prisma db push && prisma db seed",
     "prisma:generate": "prisma generate"
   },
