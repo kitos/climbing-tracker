@@ -1,34 +1,29 @@
-import TelegramBot from 'node-telegram-bot-api'
-import { prisma } from '~/prisma'
-import { DataFunctionArgs } from '@remix-run/server-runtime/routeModules'
+const TelegramBot = require('node-telegram-bot-api')
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+const token = '5378015247:AAFkshlDUgKM48CiVX710aFn1z_cJNZg6x4'
 
-const token =
-  process.env.TG_TOKEN || '5378015247:AAFkshlDUgKM48CiVX710aFn1z_cJNZg6x4'
+const bot = new TelegramBot(token, { polling: true })
 
-const botToken = new TelegramBot(token, { webHook: true })
+const problems = ['easy', 'hard']
 
-botToken.setWebHook(`https://climbing-tracker.vercel.app/bot/${token}`)
-
-export let loader = async ({ request }: DataFunctionArgs) =>
-  botToken.processUpdate((await request.formData()) as any)
-
-botToken.onText(/\/gyms/, async (msg, match) => {
+bot.onText(/\/gyms/, async (msg, match) => {
   let chat_id = msg.chat.id
 
   let [gyms, sent] = await Promise.all([
     pages.gyms(),
-    botToken.sendMessage(chat_id, 'loading...'),
+    bot.sendMessage(chat_id, 'loading...'),
   ])
 
-  botToken.editMessageText('select the gym', {
+  bot.editMessageText('select the gym', {
     chat_id: chat_id,
     message_id: sent.message_id,
     reply_markup: JSON.stringify(gyms),
   })
 })
 
-botToken.onText(/\/problems (.+)/, (msg, match) => {
-  botToken.sendMessage(msg.chat.id, 'now select problem', {
+bot.onText(/\/problems (.+)/, (msg, match) => {
+  bot.sendMessage(msg.chat.id, 'now select problem', {
     reply_markup: JSON.stringify(pages.problems(match[1])),
   })
 })
@@ -78,19 +73,23 @@ let pages = {
   },
 }
 
-botToken.on('callback_query', async ({ id, message, data }) => {
-  if (message && data) {
-    data = JSON.parse(data)
+bot.on('callback_query', async ({ id, message, data }) => {
+  data = JSON.parse(data)
 
-    botToken.editMessageText('now select problem', {
-      chat_id: message.chat.id,
-      message_id: message.message_id,
-      reply_markup:
-        data.page === 'gyms'
-          ? await pages.gyms()
-          : await pages.problems(data.gym_id),
-    })
-  } else {
-    botToken.answerCallbackQuery(id, { text: 'Unknown callback' })
-  }
+  // bot.answerCallbackQuery(id)
+  bot.editMessageText('now select problem', {
+    chat_id: message.chat.id,
+    message_id: message.message_id,
+    reply_markup:
+      data.page === 'gyms'
+        ? await pages.gyms()
+        : await pages.problems(data.gym_id),
+  })
 })
+
+// bot.on('message', (msg) => {
+//   const chatId = msg.chat.id
+//
+//   // send a message to the chat acknowledging receipt of their message
+//   bot.sendMessage(chatId, 'Received your message')
+// })
