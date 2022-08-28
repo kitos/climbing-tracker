@@ -1,9 +1,9 @@
-import { createCookieSessionStorage, redirect } from 'remix'
+import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import crypto from 'crypto'
 import { prisma } from './prisma'
 import { sign, verify } from './jwt.server'
 import { sendMagicLinkEmail } from './mail.server'
-import invariant from '@remix-run/dev/invariant'
+import invariant from '@remix-run/dev/dist/invariant'
 
 invariant(process.env.JWT_SECRET, 'JWT_SECRET is required!')
 

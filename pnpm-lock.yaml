@@ -8,6 +8,7 @@ specifiers:
   '@mui/material': ^5.10.2
   '@prisma/client': ^4.2.1
   '@remix-run/dev': ^1.7.0
+  '@remix-run/node': ^1.7.0
   '@remix-run/react': ^1.7.0
   '@remix-run/serve': ^1.7.0
   '@remix-run/vercel': ^1.7.0
@@ -36,6 +37,7 @@ dependencies:
   '@mui/lab': 5.0.0-alpha.96_4xypp46pef4svm3rzxypezu3iy
   '@mui/material': 5.10.2_sqzxty2p7kxc2tmue4tecplwku
   '@prisma/client': 4.2.1_prisma@4.2.1
+  '@remix-run/node': 1.7.0_biqbaboplfbrettd7655fr4n2y
   '@remix-run/react': 1.7.0_biqbaboplfbrettd7655fr4n2y
   '@remix-run/serve': 1.7.0_biqbaboplfbrettd7655fr4n2y
   '@remix-run/vercel': 1.7.0_biqbaboplfbrettd7655fr4n2y

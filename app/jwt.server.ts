@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import invariant from '@remix-run/dev/invariant'
+import invariant from '@remix-run/dev/dist/invariant'
 
 invariant(process.env.JWT_SECRET, 'JWT_SECRET is required!')
 

@@ -1,5 +1,5 @@
 import sgMail from '@sendgrid/mail'
-import invariant from '@remix-run/dev/invariant'
+import invariant from '@remix-run/dev/dist/invariant'
 
 invariant(process.env.SENDGRID_API_KEY, 'SENDGRID_API_KEY is required!')
 invariant(process.env.MAGIC_EMAIL_FROM, 'MAGIC_EMAIL_FROM is required!')

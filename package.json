@@ -17,6 +17,7 @@
     "@mui/lab": "5.0.0-alpha.96",
     "@mui/material": "^5.10.2",
     "@prisma/client": "^4.2.1",
+    "@remix-run/node": "^1.7.0",
     "@remix-run/react": "^1.7.0",
     "@remix-run/serve": "^1.7.0",
     "@remix-run/vercel": "^1.7.0",
