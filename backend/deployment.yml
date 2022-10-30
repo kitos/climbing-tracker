@@ -15,7 +15,7 @@ spec:
         app: climbing-back
     spec:
       containers:
-        - image: kitos/climbing-tracker-backend
+        - image: kitos/climbing-tracker-backend:main
           name: climbing-back
           ports:
             - containerPort: 80
