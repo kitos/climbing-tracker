@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: climbing-back-depl
+  labels:
+    app: climbing-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: climbing-back
+  template:
+    metadata:
+      labels:
+        app: climbing-back
+    spec:
+      containers:
+        - image: climbing-back
+          name: climbing-back
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: climbing-back-secret
+                  key: db-url
+            - name: DB_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  name: climbing-back-secret
+                  key: db-login
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: climbing-back-secret
+                  key: db-pass
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: climbing-back-service
+spec:
+  selector:
+    app: climbing-back
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: climbing-ingress
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: climbing-back-service
+                port:
+                  number: 80
