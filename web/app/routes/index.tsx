@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import { Link, useLoaderData } from '@remix-run/react'
 import {
-  Avatar,
   Button,
   Divider,
   IconButton,
@@ -14,9 +13,8 @@ import {
   Paper,
   Stack,
 } from '@mui/material'
-import { Add, Landscape, Public } from '@mui/icons-material'
+import { Add, Public } from '@mui/icons-material'
 import { prisma } from '~/prisma'
-import { trImg } from '~/image'
 import { GymAvatar } from '~/components/GymAvatar'
 
 export let loader = () =>

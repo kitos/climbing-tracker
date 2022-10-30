@@ -5,5 +5,5 @@ node_modules
 .output
 .idea
 
-public/build
-api/_build
+web/public/build
+web/api/_build
